@@ -1,8 +1,7 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 const app = require("./src/app");
 
-const PORT = 3000;
-
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+app.listen(3000, () => {
+    console.log("Servidor corriendo");
 });
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
