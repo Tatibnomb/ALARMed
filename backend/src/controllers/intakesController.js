@@ -50,8 +50,25 @@ const createIntake = async (req, res) => {
     res.status(201).json(data);
 };
 
+// Historial por medicamento (tomas de un medicamento)
+const getMedicationHistory = async (req, res) => {
+
+    const { id } = req.params;
+
+    const { data, error } = await supabase
+        .from("intakes")
+        .select("*")
+        .eq("medication_id", id);
+
+    if (error) {
+        return res.status(500).json(error);
+    }
+
+    res.json(data);
+};
+
 module.exports = {
     getIntakes,
-    getIntakesByMedication,
-    createIntake
+    createIntake,
+    getMedicationHistory
 };

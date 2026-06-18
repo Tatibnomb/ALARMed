@@ -5,6 +5,8 @@ const usersRoutes = require("./routes/usersRoutes");
 const medicationsRoutes = require("./routes/medicationsRoutes");
 const schedulesRoutes = require("./routes/schedulesRoutes");
 const intakesRoutes = require("./routes/intakesRoutes");
+const statsRoutes = require("./routes/statsRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -19,5 +21,7 @@ app.use("/users", usersRoutes);
 app.use("/medications", medicationsRoutes);
 app.use("/schedules", schedulesRoutes);
 app.use("/intakes", intakesRoutes);
+app.use("/stats", statsRoutes);
+app.use("/auth", authRoutes);
 
 module.exports = app;

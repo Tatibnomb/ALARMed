@@ -3,12 +3,12 @@ const router = express.Router();
 
 const {
     getIntakes,
-    getIntakesByMedication,
-    createIntake
+    createIntake,
+    getMedicationHistory
 } = require("../controllers/intakesController");
 
 router.get("/", getIntakes);
-router.get("/medication/:id", getIntakesByMedication);
 router.post("/", createIntake);
+router.get("/history/:id", getMedicationHistory);
 
 module.exports = router;
