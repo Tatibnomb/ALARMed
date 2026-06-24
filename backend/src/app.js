@@ -14,6 +14,9 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
+    console.log("Request recibida a las:",
+        new Date()
+    );
     res.send("API funcionando");
 });
 

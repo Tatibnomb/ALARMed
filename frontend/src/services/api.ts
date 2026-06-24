@@ -1,4 +1,11 @@
-const API_URL = "http://TU_IP_LOCAL:3000";
+const API_URL = "http://192.168.56.1:3000";
+
+export const testBackend = async () => {
+
+  const response = await fetch(API_URL);
+
+  return response.text();
+};
 
 export const loginUser = async (
   email: string,
@@ -24,37 +31,10 @@ export const loginUser = async (
   return response.json();
 };
 
-export const registerUser = async (
-  name: string,
-  email: string,
-  password: string
-) => {
-
-  const response = await fetch(
-    `${API_URL}/auth/register`,
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        name,
-        email,
-        password
-      })
-    }
-  );
-
-  return response.json();
-};
-
-export const getMedications = async () => {
-
-  const response = await fetch(
-    `${API_URL}/medications`
-  );
+export const getUsers = async () => {
+    const response = await fetch(
+        `${API_URL}/users`
+    );
 
   return response.json();
 };
