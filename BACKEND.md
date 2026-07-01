@@ -71,7 +71,7 @@ Body (JSON):
   "email": "nuevo@email.com"
 }
 
-## DELETE /users/:id
+## DELETE http://localhost:3000/users/:id
 Elimina un usuario.
 Respuesta (en formato JSON):
 {
