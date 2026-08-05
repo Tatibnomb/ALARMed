@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const authMiddleware = require("../middlewares/authMiddleware");
 
 const {
     getMedications,
@@ -8,7 +9,7 @@ const {
     deleteMedication
 } = require("../controllers/medicationsController");
 
-router.get("/", getMedications);
+router.get("/", authMiddleware, getMedications);
 router.post("/", createMedication);
 router.put("/:id", updateMedication);
 router.delete("/:id", deleteMedication);
