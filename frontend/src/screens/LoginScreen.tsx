@@ -18,9 +18,9 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
 
-    const data =
-      await loginUser(email,password);
+    const data = await loginUser(email,password);
 
+    console.log("Login: ");
     console.log(data);
   };
 

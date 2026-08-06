@@ -11,7 +11,7 @@ const {
 
 router.get("/", authMiddleware, getMedications);
 router.post("/", authMiddleware, createMedication);
-router.put("/:id", updateMedication);
+router.put("/:id", authMiddleware, updateMedication);
 router.delete("/:id", deleteMedication);
 
 module.exports = router;

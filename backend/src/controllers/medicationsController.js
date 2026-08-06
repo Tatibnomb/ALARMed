@@ -51,7 +51,9 @@ const updateMedication = async (req, res) => {
             description,
             frequency
         })
+        // Solo actualiza el medicamento si el id coincide y si el user_id coincide con el usuario autenticado
         .eq("id", id)
+        .eq("user_id", req.user.id)
         .select();
 
     if (error) {
