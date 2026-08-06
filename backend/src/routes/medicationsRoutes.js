@@ -10,7 +10,7 @@ const {
 } = require("../controllers/medicationsController");
 
 router.get("/", authMiddleware, getMedications);
-router.post("/", createMedication);
+router.post("/", authMiddleware, createMedication);
 router.put("/:id", updateMedication);
 router.delete("/:id", deleteMedication);
 

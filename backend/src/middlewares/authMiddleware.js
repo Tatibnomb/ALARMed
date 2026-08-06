@@ -1,8 +1,26 @@
-module.exports = (req , res, next) => { // es la petición que llega, res es la respuesta que va a
-// devolver el servidor, next() le dice a Express que siga con la siguiente fucnión (sino la petición
-// se queda trabada)
+const supabase = require("../config/supabase");
 
-    console.log("Middleware de autenticación ejecutado");
+module.exports = async (req, res, next) => {
+
+    const token = req.headers.authorization?.replace("Bearer ", ""); // Busca algo como esto: eyJhbGciOi...
+    // y se queda solo con el token del proyecto en Supabase
+
+    if (!token) { // Si no encuentra el token
+        return res.status(401).json({
+            message: "Token no proporcionado"
+        });
+    }
+
+    const { data, error } = await supabase.auth.getUser(token); // Consulta a Supabase
+
+    if (error) { // Si el token no es válido
+        return res.status(401).json({
+            message: "Token inválido"
+        });
+    }
+// Si todo está bien...
+    req.user = data.user; // Guarda el usuario autenticado para que los controladores puedan
+    // usarlo más adelante.
 
     next();
 

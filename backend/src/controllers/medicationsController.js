@@ -4,7 +4,8 @@ const getMedications = async (req, res) => {
 
     const { data, error } = await supabase
         .from("medications")
-        .select("*");
+        .select("*")
+        .eq("user_id", req.user.id);
 
     if (error) {
         return res.status(500).json(error);
@@ -15,19 +16,20 @@ const getMedications = async (req, res) => {
 
 const createMedication = async (req, res) => {
 
-    const { user_id, name, dosage, description } = req.body;
+const { name, dosage, description, frequency } = req.body;
 
-    const { data, error } = await supabase
-        .from("medications")
-        .insert([
-            {
-                user_id,
-                name,
-                dosage,
-                description
-            }
-        ])
-        .select();
+const { data, error } = await supabase
+    .from("medications")
+    .insert([
+        {
+            user_id: req.user.id,
+            name,
+            dosage,
+            description,
+            frequency
+        }
+    ])
+    .select();
 
     if (error) {
         return res.status(500).json(error);
