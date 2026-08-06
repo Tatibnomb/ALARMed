@@ -1,22 +1,29 @@
 import { useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
+import Button from "../components/Button";
 
 function Home() {
   const navigate = useNavigate();
 
   return (
     <div className="phone">
-      <Logo />
+      <div className="home-content">
+          <Logo />
 
-      <h2>Bienvenido a ALARMed</h2>
+          <h2>Bienvenido a ALARMed</h2>
 
-      <button onClick={() => navigate("/register")}>
-        Registrarse
-      </button>
+          <Button
+            text="Registrarse"
+            onClick={() => navigate("/register")}
+            variant="primary"
+          />
 
-      <button onClick={() => navigate("/login")}>
-        Iniciar sesión
-      </button>
+          <Button
+            text="Iniciar sesión"
+            onClick={() => navigate("/login")}
+            variant="secondary"
+          />
+      </div>
     </div>
   );
 }

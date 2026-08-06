@@ -12,9 +12,7 @@ function Register() {
 
       <Logo />
 
-      <h1 className="register-title">
-          Registrate
-      </h1>
+      <h1>Registrate</h1>
 
       <Input
         label="Nombre de usuario"

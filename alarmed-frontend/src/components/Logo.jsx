@@ -1,11 +1,13 @@
 function Logo() {
   return (
-    <div className="logo">
+    <div className="header">
       <div className="logo-icon">
         💊
       </div>
 
-      <span>ALARMed</span>
+      <span className="logo-text">
+        ALARMed
+      </span>
     </div>
   );
 }

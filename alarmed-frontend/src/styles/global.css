@@ -1,3 +1,18 @@
+:root{
+
+    --background:#ECECEC;
+
+    --gradient-top:#8C9DD6;
+
+    --gradient-bottom:#E7BCC7;
+
+    --button:#4B73FF;
+
+    --input:#B9B2DA;
+
+    --text:#FFFFFF;
+}
+
 *{
     margin:0;
     padding:0;
