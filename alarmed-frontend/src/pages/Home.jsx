@@ -1,13 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import Logo from "../components/Logo";
 
 function Home() {
   const navigate = useNavigate();
 
   return (
     <div className="phone">
-      <div className="logo">
-        💊 ALARMed
-      </div>
+      <Logo />
 
       <h2>Bienvenido a ALARMed</h2>
 

@@ -1,21 +1,20 @@
-import logo from "../assets/logo.png";
+import "../styles/global.css";
+import "../styles/components.css";
+import "../styles/register.css";
 
 import Input from "../components/Input";
 import Button from "../components/Button";
+import Logo from "../components/Logo";
 
 function Register() {
   return (
     <div className="phone">
 
-      <div className="header">
-        <img src={logo} alt="Logo" className="logo-img" />
+      <Logo />
 
-        <div className="logo-text">
-            <span>ALARMed</span>
-        </div>
-      </div>
-
-      <h1>Registrate</h1>
+      <h1 className="register-title">
+          Registrate
+      </h1>
 
       <Input
         label="Nombre de usuario"
