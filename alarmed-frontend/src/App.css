@@ -188,3 +188,20 @@ body {
 .home-content button:last-of-type {
   background: #ff5555;
 }
+
+.secondary-link {
+  margin-top: 20px;
+
+  background: none;
+  border: none;
+
+  color: white;
+
+  font-size: 15px;
+
+  cursor: pointer;
+}
+
+.secondary-link:hover {
+  text-decoration: underline;
+}
