@@ -1,44 +1,30 @@
 const express = require("express");
 const cors = require("cors");
-const supabase = require("./config/supabase");
+
+const usersRoutes = require("./routes/usersRoutes");
+const medicationsRoutes = require("./routes/medicationsRoutes");
+const schedulesRoutes = require("./routes/schedulesRoutes");
+const intakesRoutes = require("./routes/intakesRoutes");
+const statsRoutes = require("./routes/statsRoutes");
+const authRoutes = require("./routes/authRoutes");
+// const warningsRoutes = require("./routes/warningsRoutes");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req,res)=>{
+app.get("/", (req, res) => {
+    console.log("Llegó al backend");
     res.send("API funcionando");
 });
 
-app.get("/users", async(req,res)=>{
-
-    const { data, error } = await supabase
-        .from("users")
-        .select("*");
-
-    if(error){
-        return res.status(500).json(error);
-    }
-
-    res.json(data);
-
-});
+app.use("/users", usersRoutes);
+app.use("/medications", medicationsRoutes);
+app.use("/schedules", schedulesRoutes);
+app.use("/intakes", intakesRoutes);
+app.use("/stats", statsRoutes);
+app.use("/auth", authRoutes);
+// app.use("/warnings", warningsRoutes);
 
 module.exports = app;
-app.post("/users", async(req,res)=>{
-
-    const { name, email } = req.body;
-
-    const { data, error } = await supabase
-        .from("users")
-        .insert([{ name, email }])
-        .select();
-
-    if(error){
-        return res.status(500).json(error);
-    }
-
-    res.status(201).json(data);
-
-});
