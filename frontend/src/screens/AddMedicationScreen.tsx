@@ -28,6 +28,10 @@ export default function AddMedicationScreen() {
         });
 
       console.log(data);
+      setName("");
+      setDosage("");
+      setDescription("");
+      setFrequency("");
     };
 
   return (
@@ -48,7 +52,11 @@ export default function AddMedicationScreen() {
     placeholder="Dosis"
     value={dosage}
     onChangeText={setDosage}
-    />
+    style={{
+      borderWidth: 1,
+      marginBottom: 20
+    }}
+  />
 
       <TextInput
         placeholder="Descripción"
@@ -64,6 +72,10 @@ export default function AddMedicationScreen() {
     placeholder="Frecuencia"
     value={frequency}
     onChangeText={setFrequency}
+    style={{
+      borderWidth: 1,
+      marginBottom: 20
+        }}
     />
 
       <Button
