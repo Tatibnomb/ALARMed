@@ -49,9 +49,11 @@ export const registerUser = async (
 /* TYPES */
 
 export interface Medication {
-  user_id: string;
+  id?: string;
   name: string;
+  dosage: string;
   description: string;
+  frequency: string;
 }
 
 /* CREATE MEDICATION */

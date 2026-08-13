@@ -12,32 +12,29 @@ import {
 
 export default function AddMedicationScreen() {
 
-  const [name, setName] =
-    useState<string>("");
+  const [name, setName] = useState("");
+  const [dosage, setDosage] = useState("");
+  const [description, setDescription] = useState("");
+  const [frequency, setFrequency] = useState("");
 
-  const [description,
-    setDescription] =
-    useState<string>("");
+  const handleCreate = async () => {
 
-  const handleCreate =
-    async () => {
+    const data = await createMedication({
+      name,
+      dosage,
+      description,
+      frequency
+    });
 
-      const data =
-        await createMedication({
+    console.log(data);
 
-          user_id:
-            "PEGAR_UUID_USUARIO",
-
-          name,
-
-          description
-        });
-
-      console.log(data);
-    };
+    setName("");
+    setDosage("");
+    setDescription("");
+    setFrequency("");
+  };
 
   return (
-
     <View style={{ padding: 40 }}>
 
       <TextInput
@@ -51,9 +48,29 @@ export default function AddMedicationScreen() {
       />
 
       <TextInput
+        placeholder="Dosis"
+        value={dosage}
+        onChangeText={setDosage}
+        style={{
+          borderWidth: 1,
+          marginBottom: 20
+        }}
+      />
+
+      <TextInput
         placeholder="Descripción"
         value={description}
         onChangeText={setDescription}
+        style={{
+          borderWidth: 1,
+          marginBottom: 20
+        }}
+      />
+
+      <TextInput
+        placeholder="Frecuencia"
+        value={frequency}
+        onChangeText={setFrequency}
         style={{
           borderWidth: 1,
           marginBottom: 20
