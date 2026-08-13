@@ -1,0 +1,93 @@
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:40px;
+}
+
+.logo-icon{
+    font-size:32px;
+}
+
+.logo h2{
+    color:white;
+    font-size:34px;
+    font-weight:700;
+}
+
+.input-group{
+
+    display:flex;
+
+    flex-direction:column;
+
+    margin-bottom:22px;
+}
+
+.input-group label{
+
+    color:var(--text);
+
+    font-size:20px;
+
+    margin-bottom:8px;
+}
+
+.input-group input{
+
+    height:56px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:var(--input);
+
+    padding:18px;
+
+    font-size:16px;
+
+    outline:none;
+}
+
+.input-group input:focus{
+
+    border:2px solid white;
+}
+
+.primary-button{
+
+    width:220px;
+
+    height:52px;
+
+    margin:35px auto 0;
+
+    display:block;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:var(--button);
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.primary-button:hover{
+
+    transform:scale(1.03);
+}
+
+.status-icons{
+    display:flex;
+    gap:6px;
+}

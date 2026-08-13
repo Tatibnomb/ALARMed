@@ -1,0 +1,43 @@
+:root{
+
+    --background:#ECECEC;
+
+    --gradient-top:#8C9DD6;
+
+    --gradient-bottom:#E7BCC7;
+
+    --button:#4B73FF;
+
+    --input:#B9B2DA;
+
+    --text:#FFFFFF;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#ececec;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+.phone{
+
+    width:390px;
+    min-height:844px;
+
+    background: linear-gradient(
+        180deg,
+        #8C9DD6 0%,
+        #E7BCC7 100%
+    );
+
+    border-radius:30px;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.2);
+
+    padding:30px;
+}
