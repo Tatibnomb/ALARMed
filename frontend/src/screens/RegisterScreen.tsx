@@ -19,11 +19,15 @@ export default function RegisterScreen() {
   const [password, setPassword] =
     useState<string>("");
 
+  const [name, setName] =
+    useState<string>("");
+
   const handleRegister =
     async () => {
 
       const data =
         await registerUser(
+          name,
           email,
           password
         );

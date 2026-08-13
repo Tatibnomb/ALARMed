@@ -66,9 +66,11 @@ export const registerUser = async (
 /* TYPES */
 
 export interface Medication {
-  user_id: string;
+  id?: string,
   name: string;
+  dosage: string,
   description: string;
+  frequency: string;
 }
 
 /* CREATE MEDICATION */
@@ -82,6 +84,38 @@ export const createMedication = async (
       method: "POST",
       headers: await getAuthHeaders(),
       body: JSON.stringify(medication)
+    }
+  );
+
+  return response.json();
+};
+
+/* UPDATE MEDICATION */
+export const updateMedication = async (
+  id: string,
+  medication: Medication
+) => {
+  const response = await fetch(
+    `${API_URL}/medications/${id}`,
+    {
+      method: "PUT",
+      headers: await getAuthHeaders(),
+      body: JSON.stringify(medication)
+    }
+  );
+
+  return response.json();
+};
+
+/*DELETE MEDICATION */
+export const deleteMedication = async (
+  id: string
+) => {
+  const response = await fetch(
+    `${API_URL}/medications/${id}`,
+    {
+      method: "DELETE",
+      headers: await getAuthHeaders()
     }
   );
 

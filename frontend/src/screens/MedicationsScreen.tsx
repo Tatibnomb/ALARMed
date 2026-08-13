@@ -43,13 +43,21 @@ export default function MedicationsScreen() {
     <View style={{ padding: 40 }}>
 
       {medications.map((med) => (
+        
+interface Medication {
+  id: string;
+  name: string;
+  dosage: string;
+  description: string;
+  frequency: string;
+}
 
-        <Text key={med.id}>
-          {med.name}
-        </Text>
-
-      ))}
-
-    </View>
-  );
+{medications.map((med) => (
+  <View key={med.id}>
+    <Text>{med.name}</Text>
+    <Text>{med.dosage}</Text>
+    <Text>{med.description}</Text>
+    <Text>{med.frequency}</Text>
+  </View>
+))};
 }

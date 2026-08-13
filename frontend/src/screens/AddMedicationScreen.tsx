@@ -11,26 +11,20 @@ import {
 } from "../services/api";
 
 export default function AddMedicationScreen() {
-
-  const [name, setName] =
-    useState<string>("");
-
-  const [description,
-    setDescription] =
-    useState<string>("");
+  const [name, setName] = useState("");
+  const [dosage, setDosage] = useState("");
+  const [description, setDescription] = useState("");
+  const [frequency, setFrequency] = useState("");
 
   const handleCreate =
     async () => {
 
       const data =
         await createMedication({
-
-          user_id:
-            "PEGAR_UUID_USUARIO",
-
           name,
-
-          description
+          dosage,
+          description,
+          frequency,
         });
 
       console.log(data);
@@ -50,6 +44,12 @@ export default function AddMedicationScreen() {
         }}
       />
 
+    <TextInput
+    placeholder="Dosis"
+    value={dosage}
+    onChangeText={setDosage}
+    />
+
       <TextInput
         placeholder="Descripción"
         value={description}
@@ -59,6 +59,12 @@ export default function AddMedicationScreen() {
           marginBottom: 20
         }}
       />
+
+    <TextInput
+    placeholder="Frecuencia"
+    value={frequency}
+    onChangeText={setFrequency}
+    />
 
       <Button
         title="Guardar"
