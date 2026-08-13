@@ -1,7 +1,5 @@
 const API_URL = "http://192.168.56.1:3000";
 
-/* LOGIN */
-
 export const loginUser = async (email, password) => {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
@@ -14,22 +12,11 @@ export const loginUser = async (email, password) => {
     }),
   });
 
-  return response.json();
-};
+  const data = await response.json();
 
-/* REGISTER */
+  if (!response.ok) {
+    throw new Error(data.message || "Error al iniciar sesión");
+  }
 
-export const registerUser = async (email, password) => {
-  const response = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
-  });
-
-  return response.json();
+  return data;
 };
