@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const API_URL = "http://192.168.56.1:3000";
 
 /* LOGIN */
@@ -20,12 +21,27 @@ export const loginUser = async (
     }
   );
 
-  return response.json();
+  const data = await response.json();
+
+
+if(data.session){
+
+await AsyncStorage.setItem(
+"token",
+data.session.access_token
+);
+
+}
+
+
+return data;
+
 };
 
 /* REGISTER */
 
 export const registerUser = async (
+  name: string,
   email: string,
   password: string
 ) => {
@@ -37,6 +53,7 @@ export const registerUser = async (
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        name,
         email,
         password
       })
@@ -63,9 +80,7 @@ export const createMedication = async (
     `${API_URL}/medications`,
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: await getAuthHeaders(),
       body: JSON.stringify(medication)
     }
   );
@@ -76,12 +91,24 @@ export const createMedication = async (
 /* GET MEDICATIONS */
 
 export const getMedications =
-  async () => {
-    const response = await fetch(
-      `${API_URL}/medications`
-    );
+async()=>{
 
-    return response.json();
+
+const headers =
+await getAuthHeaders();
+
+
+const response =
+await fetch(
+`${API_URL}/medications`,
+{
+headers
+}
+);
+
+
+return response.json();
+
 };
 
 /* GET HISTORY */
@@ -93,4 +120,17 @@ export const getIntakes =
     );
 
     return response.json();
+};
+
+const getAuthHeaders = async()=>{
+
+const token =
+await AsyncStorage.getItem("token");
+
+
+return {
+"Content-Type":"application/json",
+Authorization:`Bearer ${token}`
+};
+
 };
