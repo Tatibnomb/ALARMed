@@ -55,7 +55,7 @@ function Dashboard() {
 
             <button
               className="primary-button"
-              onClick={() => navigate("/medications")}
+              onClick={() => navigate("/add-medication")}
             >
               + Agregar medicamento
             </button>
