@@ -7,7 +7,7 @@ const {
     createSchedule
 } = require("../controllers/schedulesController");
 
-router.get("/", getSchedules);
-router.post("/", createSchedule);
+router.get("/", authMiddleware, getSchedules);
+router.post("/", authMiddleware, createSchedule);
 
 module.exports = router;
