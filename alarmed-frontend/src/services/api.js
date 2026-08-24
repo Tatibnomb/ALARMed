@@ -19,8 +19,8 @@ export const loginUser = async (email, password) => {
   }
 // Guardamos el token para usarlo en las próximas
   // peticiones que necesitan autenticación.
-  if (data.session?.access_token) {
-    localStorage.setItem("token", data.session.access_token);
+  if (data.access_token) {
+    localStorage.setItem("token", data.access_token);
   }
 
   return data;
@@ -34,6 +34,7 @@ export const createMedication = async ({
   dosage,
   description,
   frequency,
+  hour
 }) => {
   const token = localStorage.getItem("token");
 
@@ -54,6 +55,7 @@ export const createMedication = async ({
       dosage,
       description,
       frequency,
+      hour
     }),
   });
 
@@ -62,40 +64,6 @@ export const createMedication = async ({
   if (!response.ok) {
     throw new Error(
       data.message || "Error al guardar el medicamento"
-    );
-  }
-
-  return data;
-};
-export const createSchedule = async ({
-  medication_id,
-  hour,
-}) => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    throw new Error("No hay una sesión iniciada");
-  }
-
-  const response = await fetch(`${API_URL}/schedules`, {
-    method: "POST",
-
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-
-    body: JSON.stringify({
-      medication_id,
-      hour,
-    }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.message || "Error al guardar el horario"
     );
   }
 
