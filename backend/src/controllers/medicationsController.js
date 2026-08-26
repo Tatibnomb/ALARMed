@@ -17,7 +17,7 @@ const getMedications = async (req, res) => {
     res.json(data);
 };
 
-const createMedication = async (req, res) => {}
+const createMedication = async (req, res) => {
     
     const {
         name,
@@ -85,6 +85,7 @@ if (!name || !dosage || !frequency || !hour) {
         medication: medicationData,
         schedule: scheduleData
     });
+};
 
 const updateMedication = async (req, res) => {
 
