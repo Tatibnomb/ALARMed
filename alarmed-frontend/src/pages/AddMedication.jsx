@@ -43,9 +43,13 @@ function AddMedication() {
         frequency,
       });
       console.log("Medicamento guardado:", medication);
-      const medicationId = medication[0].id;
+
+      const medicationId = Array.isArray(medication)
+        ? medication[0].id
+        : medication.id;
+
       await createSchedule({
-        medication_id: medication.id,
+        medication_id: medicationId,
         hour,
       });
 

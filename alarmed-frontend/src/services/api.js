@@ -1,5 +1,10 @@
 const API_URL = "http://192.168.56.1:3000";
 
+
+// =========================
+// LOGIN
+// =========================
+
 export const loginUser = async (email, password) => {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
@@ -17,8 +22,8 @@ export const loginUser = async (email, password) => {
   if (!response.ok) {
     throw new Error(data.message || "Error al iniciar sesión");
   }
-// Guardamos el token para usarlo en las próximas
-  // peticiones que necesitan autenticación.
+
+  // Guardamos el token para las próximas peticiones
   if (data.access_token) {
     localStorage.setItem("token", data.access_token);
   }
@@ -27,14 +32,16 @@ export const loginUser = async (email, password) => {
 };
 
 
-/* MEDICAMENTOS */
+// =========================
+// MEDICAMENTOS
+// =========================
 
 export const createMedication = async ({
   name,
   dosage,
   description,
   frequency,
-  hour
+  hour,
 }) => {
   const token = localStorage.getItem("token");
 
@@ -55,7 +62,7 @@ export const createMedication = async ({
       dosage,
       description,
       frequency,
-      hour
+      hour,
     }),
   });
 
@@ -64,6 +71,46 @@ export const createMedication = async ({
   if (!response.ok) {
     throw new Error(
       data.message || "Error al guardar el medicamento"
+    );
+  }
+
+  return data;
+};
+
+
+// =========================
+// HORARIOS
+// =========================
+
+export const createSchedule = async ({
+  medication_id,
+  hour,
+}) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("No hay una sesión iniciada");
+  }
+
+  const response = await fetch(`${API_URL}/schedules`, {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+
+    body: JSON.stringify({
+      medication_id,
+      hour,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Error al guardar el horario"
     );
   }
 
