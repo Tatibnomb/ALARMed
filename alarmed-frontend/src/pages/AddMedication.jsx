@@ -2,10 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/add-medication.css";
 
-import {
-  createMedication,
-  createSchedule,
-} from "../services/api";
+import { createMedication } from "../services/api";
 
 function AddMedication() {
   const navigate = useNavigate();
@@ -41,19 +38,10 @@ function AddMedication() {
         dosage,
         description: "",
         frequency,
-      });
-      console.log("Medicamento guardado:", medication);
-
-      const medicationId = Array.isArray(medication)
-        ? medication[0].id
-        : medication.id;
-
-      await createSchedule({
-        medication_id: medicationId,
         hour,
       });
 
-      console.log("Horario guardado:", hour);
+      console.log("Medicamento y horario guardados:", medication);
 
       setMessage("¡Medicamento guardado correctamente!");
 

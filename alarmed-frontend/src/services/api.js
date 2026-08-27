@@ -1,6 +1,5 @@
 const API_URL = "http://192.168.56.1:3000";
 
-
 // =========================
 // LOGIN
 // =========================
@@ -23,9 +22,9 @@ export const loginUser = async (email, password) => {
     throw new Error(data.message || "Error al iniciar sesión");
   }
 
-  // Guardamos el token para las próximas peticiones
-  if (data.access_token) {
-    localStorage.setItem("token", data.access_token);
+  // Guardamos el token de Supabase
+  if (data.session?.access_token) {
+    localStorage.setItem("token", data.session.access_token);
   }
 
   return data;
@@ -71,46 +70,6 @@ export const createMedication = async ({
   if (!response.ok) {
     throw new Error(
       data.message || "Error al guardar el medicamento"
-    );
-  }
-
-  return data;
-};
-
-
-// =========================
-// HORARIOS
-// =========================
-
-export const createSchedule = async ({
-  medication_id,
-  hour,
-}) => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    throw new Error("No hay una sesión iniciada");
-  }
-
-  const response = await fetch(`${API_URL}/schedules`, {
-    method: "POST",
-
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-
-    body: JSON.stringify({
-      medication_id,
-      hour,
-    }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.message || "Error al guardar el horario"
     );
   }
 
