@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "expo": "^57.0.17",
+    "expo-notifications": "~57.0.15",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2"
