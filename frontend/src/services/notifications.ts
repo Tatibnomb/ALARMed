@@ -1,4 +1,4 @@
-import * as Notifications from "expo-notifications";
+const Notifications: any = require("expo-notifications");
 import { Platform } from "react-native";
 
 // Configuramos qué debe hacer la notificación // cuando llega al celular.

@@ -26,8 +26,12 @@ const getSchedules = async (req, res) => {
 };
 
 const createSchedule = async (req, res) => {
-
-    const { medication_id, hour } = req.body;
+    
+    const {
+        medication_id,
+        date,
+        hour
+    } = req.body;
 
     const owns = await medicationBelongsToUser(medication_id, req.user.id);
 
@@ -39,7 +43,11 @@ const createSchedule = async (req, res) => {
 
     const { data, error } = await supabase
         .from("schedules")
-        .insert([{ medication_id, hour }])
+        .insert([{
+            medication_id,
+            date,
+            hour
+        }])
         .select();
 
     if (error) {

@@ -176,3 +176,6 @@ Ejemplo respuesta (en formato JSON):
   "taken": true,
   "taken_at": "2025-07-24T18:00:00"
 }
+
+## AUTENTICACIÓN
+Agregué el archivo authMiddleware para que tenga que estar sí o sí logueado el usuario para, por ejemplo, eliminar un medicamento

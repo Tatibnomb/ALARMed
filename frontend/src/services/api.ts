@@ -220,3 +220,47 @@ const getAuthHeaders = async () => {
     Authorization: `Bearer ${token}`
   };
 };
+
+/* CREATE SCHEDULE */
+
+export const createSchedule = async (
+  schedule: {
+    medication_id: string;
+    date: string;
+    hour: string;
+  }
+) => {
+
+  const response = await fetch(
+    `${API_URL}/schedules`,
+    {
+      method: "POST",
+
+      headers: await getAuthHeaders(),
+
+      body: JSON.stringify(schedule)
+    }
+  );
+
+
+  const data = await response.json();
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      data.message ||
+      "Error al guardar el horario"
+    );
+
+  }
+
+
+  console.log(
+    "Horario guardado:",
+    data
+  );
+
+
+  return data;
+};
