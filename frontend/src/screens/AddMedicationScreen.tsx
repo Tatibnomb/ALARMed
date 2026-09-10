@@ -11,31 +11,34 @@ import {
 } from "../services/api";
 
 export default function AddMedicationScreen() {
+
+  // Estados que guardan los datos que escribe el usuario
   const [name, setName] = useState("");
   const [dosage, setDosage] = useState("");
   const [description, setDescription] = useState("");
   const [frequency, setFrequency] = useState("");
 
-  const handleCreate =
-    async () => {
+  // Función que se ejecuta cuando se toca "Guardar"
+  const handleCreate = async () => {
 
-      const data =
-        await createMedication({
-          name,
-          dosage,
-          description,
-          frequency,
-        });
+    // Enviamos los datos del formulario al backend
+    const data = await createMedication({
+      name,
+      dosage,
+      description,
+      frequency
+    });
 
-      console.log(data);
-      setName("");
-      setDosage("");
-      setDescription("");
-      setFrequency("");
-    };
+    console.log(data);
+
+    // Limpiamos el formulario después de guardar
+    setName("");
+    setDosage("");
+    setDescription("");
+    setFrequency("");
+  };
 
   return (
-
     <View style={{ padding: 40 }}>
 
       <TextInput
@@ -48,15 +51,15 @@ export default function AddMedicationScreen() {
         }}
       />
 
-    <TextInput
-    placeholder="Dosis"
-    value={dosage}
-    onChangeText={setDosage}
-    style={{
-      borderWidth: 1,
-      marginBottom: 20
-    }}
-  />
+      <TextInput
+        placeholder="Dosis"
+        value={dosage}
+        onChangeText={setDosage}
+        style={{
+          borderWidth: 1,
+          marginBottom: 20
+        }}
+      />
 
       <TextInput
         placeholder="Descripción"
@@ -68,15 +71,15 @@ export default function AddMedicationScreen() {
         }}
       />
 
-    <TextInput
-    placeholder="Frecuencia"
-    value={frequency}
-    onChangeText={setFrequency}
-    style={{
-      borderWidth: 1,
-      marginBottom: 20
+      <TextInput
+        placeholder="Frecuencia"
+        value={frequency}
+        onChangeText={setFrequency}
+        style={{
+          borderWidth: 1,
+          marginBottom: 20
         }}
-    />
+      />
 
       <Button
         title="Guardar"

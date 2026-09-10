@@ -19,6 +19,13 @@ app.get("/", (req, res) => {
     res.send("API funcionando");
 });
 
+console.log("usersRoutes:", typeof usersRoutes);
+console.log("medicationsRoutes:", typeof medicationsRoutes);
+console.log("schedulesRoutes:", typeof schedulesRoutes);
+console.log("intakesRoutes:", typeof intakesRoutes);
+console.log("statsRoutes:", typeof statsRoutes);
+console.log("authRoutes:", typeof authRoutes);
+
 app.use("/users", usersRoutes);
 app.use("/medications", medicationsRoutes);
 app.use("/schedules", schedulesRoutes);

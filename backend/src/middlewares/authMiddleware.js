@@ -5,6 +5,8 @@ module.exports = async (req, res, next) => {
     const token = req.headers.authorization?.replace("Bearer ", ""); // Busca algo como esto: eyJhbGciOi...
     // y se queda solo con el token del proyecto en Supabase
 
+    console.log("TOKEN RECIBIDO:", token);
+
     if (!token) { // Si no encuentra el token
         return res.status(401).json({
             message: "Token no proporcionado"
