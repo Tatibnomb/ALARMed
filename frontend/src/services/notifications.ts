@@ -1,7 +1,7 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
-// Qué debe hacer la notificación cuando llega
+// Configuramos qué debe hacer la notificación // cuando llega al celular.
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldPlaySound: true,
@@ -26,11 +26,11 @@ export const requestNotificationPermissions = async () => {
   return status === "granted";
 };
 
-// Crear la alarma
+// Programa una alarma para una fecha y hora determinada.
 export const scheduleMedicationAlarm = async (
   medicationName: string,
-  hour: number,
-  minute: number
+  date: string,
+  hour: string
 ) => {
 
   const permission =
@@ -54,28 +54,26 @@ export const scheduleMedicationAlarm = async (
     );
   }
 
-  // Programar alarma diaria
-  const notificationId =
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "💊 Recordatorio de medicamento",
-        body: `Es hora de tomar ${medicationName}`,
-        sound: "default",
-      },
-
-      trigger: {
-        type:
-          Notifications.SchedulableTriggerInputTypes
-            .DAILY,
-        hour,
-        minute,
-      },
-    });
-
-  console.log(
-    "Alarma programada:",
-    notificationId
+  // Separamos la hora.
+  // Ejemplo: "08:30" → hora = 8, minutos = 30
+const [hours, minutes] = hour.split(":").map(Number);
+// Separamos la fecha.
+// Ejemplo: "2026-09-10"
+const [year, month, day] = date.split("-").map(Number);
+const notificationDate = new Date( year, month - 1, day, hours, minutes, 0, 0 );
+// Si la fecha ya pasó, no programamos la alarma.
+if (notificationDate.getTime() <= Date.now()) {
+  console.log( "La fecha y hora seleccionadas ya pasaron."
   );
-
-  return notificationId;
-};
+  return null;
+}
+// Programamos la notificación para esa fecha.
+const notificationId = await Notifications.scheduleNotificationAsync({
+  content: {
+    title: "💊 Recordatorio de medicamento",
+    body: `Es hora de tomar ${medicationName}`,
+    sound: "default",
+  },
+  trigger: { type: Notifications.SchedulableTriggerInputTypes
+    .DATE, date: notificationDate, channelId: Platform.OS === "android" ? "medications" : undefined, }, });
+    console.log( "Alarma programada:", notificationId ); console.log( "Fecha de alarma:", notificationDate ); return notificationId; };
