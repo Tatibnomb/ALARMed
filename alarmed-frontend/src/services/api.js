@@ -75,7 +75,6 @@ export const createMedication = async ({
   return data;
 };
 
-
 // =========================
 // OBTENER MEDICAMENTOS
 // =========================
@@ -89,7 +88,6 @@ export const getMedications = async () => {
 
   const response = await fetch(`${API_URL}/medications`, {
     method: "GET",
-
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -113,12 +111,7 @@ export const getMedications = async () => {
 
 export const updateMedication = async (
   id,
-  {
-    name,
-    dosage,
-    description,
-    frequency,
-  }
+  { name, dosage, description, frequency }
 ) => {
   const token = localStorage.getItem("token");
 

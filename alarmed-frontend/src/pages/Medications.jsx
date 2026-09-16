@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/medications.css";
 
-import { getMedications } from "../services/api";
+import {
+  getMedications,
+  updateMedication,
+  deleteMedication,
+} from "../services/api";
 
 function Medications() {
   const navigate = useNavigate();
@@ -11,34 +15,139 @@ function Medications() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Medicamento que estamos editando
+  const [editingMedication, setEditingMedication] = useState(null);
+
+  const [editName, setEditName] = useState("");
+  const [editDosage, setEditDosage] = useState("");
+  const [editFrequency, setEditFrequency] = useState("");
+
+  const [saving, setSaving] = useState(false);
+
+
+  // =========================
+  // CARGAR MEDICAMENTOS
+  // =========================
+
+  const loadMedications = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await getMedications();
+
+      console.log("Medicamentos recibidos:", data);
+
+      setMedications(data);
+    } catch (error) {
+      console.error("Error al obtener medicamentos:", error);
+
+      setError(
+        error.message || "No se pudieron cargar los medicamentos."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   useEffect(() => {
-    const loadMedications = async () => {
-      try {
-        setLoading(true);
-        setError("");
-
-        const data = await getMedications();
-
-        console.log("Medicamentos recibidos:", data);
-
-        setMedications(data);
-      } catch (error) {
-        console.error("Error al obtener medicamentos:", error);
-        setError(
-          error.message || "No se pudieron cargar los medicamentos."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadMedications();
   }, []);
+
+
+  // =========================
+  // ABRIR EDICIÓN
+  // =========================
+
+  const handleEdit = (medication) => {
+    setEditingMedication(medication);
+
+    setEditName(medication.name || "");
+    setEditDosage(medication.dosage || "");
+    setEditFrequency(medication.frequency || "");
+  };
+
+
+  // =========================
+  // GUARDAR EDICIÓN
+  // =========================
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+
+    if (!editName || !editDosage || !editFrequency) {
+      alert("Completá todos los campos.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      await updateMedication(editingMedication.id, {
+        name: editName,
+        dosage: editDosage,
+        description: editingMedication.description || "",
+        frequency: editFrequency,
+      });
+
+      console.log("Medicamento editado correctamente");
+
+      setEditingMedication(null);
+
+      await loadMedications();
+
+    } catch (error) {
+      console.error("Error al editar:", error);
+
+      alert(
+        error.message || "No se pudo editar el medicamento."
+      );
+
+    } finally {
+      setSaving(false);
+    }
+  };
+
+
+  // =========================
+  // ELIMINAR
+  // =========================
+
+  const handleDelete = async (id) => {
+    const confirmar = window.confirm(
+      "¿Estás seguro/a de que querés eliminar este medicamento?"
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    try {
+      await deleteMedication(id);
+
+      console.log("Medicamento eliminado");
+
+      // Lo sacamos de la pantalla sin tener que recargar
+      setMedications((current) =>
+        current.filter((medication) => medication.id !== id)
+      );
+
+    } catch (error) {
+      console.error("Error al eliminar:", error);
+
+      alert(
+        error.message || "No se pudo eliminar el medicamento."
+      );
+    }
+  };
+
 
   return (
     <div className="medications">
 
       <header className="medications-header">
+
         <button
           className="back-button"
           onClick={() => navigate("/dashboard")}
@@ -47,6 +156,7 @@ function Medications() {
         </button>
 
         <h1>Mis medicamentos</h1>
+
       </header>
 
 
@@ -77,6 +187,7 @@ function Medications() {
 
         {!loading && error && (
           <div className="empty-medications">
+
             <div className="medication-icon">
               ⚠️
             </div>
@@ -84,14 +195,19 @@ function Medications() {
             <h3>No se pudieron cargar los medicamentos</h3>
 
             <p>{error}</p>
+
           </div>
         )}
 
 
-        {/* LISTA VACÍA */}
+        {/* SIN MEDICAMENTOS */}
 
-        {!loading && !error && medications.length === 0 && (
+        {!loading &&
+          !error &&
+          medications.length === 0 && (
+
           <div className="empty-medications">
+
             <div className="medication-icon">
               💊
             </div>
@@ -109,16 +225,21 @@ function Medications() {
             >
               + Agregar medicamento
             </button>
+
           </div>
         )}
 
 
-        {/* LISTA DE MEDICAMENTOS */}
+        {/* LISTA */}
 
-        {!loading && !error && medications.length > 0 && (
+        {!loading &&
+          !error &&
+          medications.length > 0 && (
+
           <div className="medications-list">
 
             {medications.map((medication) => (
+
               <div
                 className="medication-card"
                 key={medication.id}
@@ -131,6 +252,7 @@ function Medications() {
                   </div>
 
                   <div>
+
                     <h3>{medication.name}</h3>
 
                     <p>
@@ -143,11 +265,14 @@ function Medications() {
 
                     {medication.schedules &&
                       medication.schedules.length > 0 && (
-                        <p>
-                          Horario:{" "}
-                          {medication.schedules[0].hour}
-                        </p>
+
+                      <p>
+                        Horario:{" "}
+                        {medication.schedules[0].hour}
+                      </p>
+
                     )}
+
                   </div>
 
                 </div>
@@ -156,22 +281,14 @@ function Medications() {
                 <div className="medication-card-actions">
 
                   <button
-                    onClick={() =>
-                      console.log(
-                        "Editar medicamento:",
-                        medication
-                      )
-                    }
+                    onClick={() => handleEdit(medication)}
                   >
                     Editar
                   </button>
 
                   <button
                     onClick={() =>
-                      console.log(
-                        "Eliminar medicamento:",
-                        medication
-                      )
+                      handleDelete(medication.id)
                     }
                   >
                     Eliminar
@@ -180,24 +297,144 @@ function Medications() {
                 </div>
 
               </div>
+
             ))}
 
           </div>
         )}
 
 
-        {/* BOTÓN AGREGAR */}
+        {/* AGREGAR */}
 
-        {!loading && medications.length > 0 && (
+        {!loading &&
+          !error &&
+          medications.length > 0 && (
+
           <button
             className="primary-button add-medication-button"
             onClick={() => navigate("/add-medication")}
           >
             + Agregar medicamento
           </button>
+
+        )}
+
+
+        {/* =========================
+            FORMULARIO DE EDICIÓN
+        ========================= */}
+
+        {editingMedication && (
+
+          <div className="edit-medication">
+
+            <h2>Editar medicamento</h2>
+
+            <form onSubmit={handleSaveEdit}>
+
+              <div className="form-group">
+
+                <label>
+                  Nombre del medicamento
+                </label>
+
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) =>
+                    setEditName(e.target.value)
+                  }
+                />
+
+              </div>
+
+
+              <div className="form-group">
+
+                <label>
+                  Dosis
+                </label>
+
+                <input
+                  type="text"
+                  value={editDosage}
+                  onChange={(e) =>
+                    setEditDosage(e.target.value)
+                  }
+                />
+
+              </div>
+
+
+              <div className="form-group">
+
+                <label>
+                  Frecuencia
+                </label>
+
+                <select
+                  value={editFrequency}
+                  onChange={(e) =>
+                    setEditFrequency(e.target.value)
+                  }
+                >
+
+                  <option value="">
+                    Seleccioná una frecuencia
+                  </option>
+
+                  <option value="Una vez al día">
+                    Una vez al día
+                  </option>
+
+                  <option value="Dos veces al día">
+                    Dos veces al día
+                  </option>
+
+                  <option value="Tres veces al día">
+                    Tres veces al día
+                  </option>
+
+                  <option value="Otra">
+                    Otra
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <div className="edit-buttons">
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setEditingMedication(null)
+                  }
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="submit"
+                  className="primary-button"
+                  disabled={saving}
+                >
+                  {saving
+                    ? "Guardando..."
+                    : "Guardar cambios"}
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+
         )}
 
       </main>
+
     </div>
   );
 }
