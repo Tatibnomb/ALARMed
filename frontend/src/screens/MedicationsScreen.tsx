@@ -15,38 +15,46 @@ import {
 interface Medication {
   id: string;
   name: string;
+  dosage: string;
+  description: string;
+  frequency: string;
 }
 
 export default function MedicationsScreen() {
 
-  const [medications,
-    setMedications] =
+  const [medications, setMedications] =
     useState<Medication[]>([]);
 
   useEffect(() => {
-
     loadData();
-
   }, []);
 
-  const loadData =
-    async () => {
+  const loadData = async () => {
 
-      const data =
-        await getMedications();
+    const data = await getMedications();
 
-      setMedications(data);
-    };
+    setMedications(data);
+  };
 
   return (
-
     <View style={{ padding: 40 }}>
 
       {medications.map((med) => (
+        
+        <View
+          key={med.id}
+          style={{ marginBottom: 20 }}
+        >
 
-        <Text key={med.id}>
-          {med.name}
-        </Text>
+          <Text>{med.name}</Text>
+
+          <Text>{med.dosage}</Text>
+
+          <Text>{med.description}</Text>
+
+          <Text>{med.frequency}</Text>
+
+        </View>
 
       ))}
 
