@@ -176,3 +176,71 @@ export const deleteMedication = async (id) => {
 
   return data;
 };
+
+// =========================
+// MARCAR TOMA COMO HECHA
+// =========================
+
+export const markDoseTaken = async (medicationId) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("No hay una sesión iniciada");
+  }
+
+  const response = await fetch(`${API_URL}/intakes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      medication_id: medicationId,
+      taken: true,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Error al registrar la toma");
+  }
+
+  return data;
+};
+
+// =========================
+// TOMAS DE HOY
+// =========================
+
+export const getTodayIntakes = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("No hay una sesión iniciada");
+  }
+
+  const response = await fetch(`${API_URL}/intakes`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Error al obtener las tomas");
+  }
+
+  // Filtramos acá las que son de hoy y están marcadas como tomadas
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  return data.filter(
+    (intake) =>
+      intake.taken === true &&
+      intake.taken_at &&
+      new Date(intake.taken_at) >= startOfDay
+  );
+};

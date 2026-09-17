@@ -6,6 +6,8 @@ import {
   getMedications,
   updateMedication,
   deleteMedication,
+  markDoseTaken,
+  getTodayIntakes,
 } from "../services/api";
 
 function Medications() {
@@ -15,18 +17,18 @@ function Medications() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Medicamento que estamos editando
-  const [editingMedication, setEditingMedication] = useState(null);
+  // IDs de medicamentos ya tomados hoy
+  const [takenToday, setTakenToday] = useState(new Set());
+  const [markingId, setMarkingId] = useState(null);
 
+  const [editingMedication, setEditingMedication] = useState(null);
   const [editName, setEditName] = useState("");
   const [editDosage, setEditDosage] = useState("");
   const [editFrequency, setEditFrequency] = useState("");
-
   const [saving, setSaving] = useState(false);
 
-
   // =========================
-  // CARGAR MEDICAMENTOS
+  // CARGAR MEDICAMENTOS + TOMAS DE HOY
   // =========================
 
   const loadMedications = async () => {
@@ -34,14 +36,17 @@ function Medications() {
       setLoading(true);
       setError("");
 
-      const data = await getMedications();
+      const [medsData, intakesData] = await Promise.all([
+        getMedications(),
+        getTodayIntakes(),
+      ]);
 
-      console.log("Medicamentos recibidos:", data);
-
-      setMedications(data);
+      setMedications(medsData);
+      setTakenToday(
+        new Set(intakesData.map((intake) => intake.medication_id))
+      );
     } catch (error) {
       console.error("Error al obtener medicamentos:", error);
-
       setError(
         error.message || "No se pudieron cargar los medicamentos."
       );
@@ -50,118 +55,87 @@ function Medications() {
     }
   };
 
-
   useEffect(() => {
     loadMedications();
   }, []);
 
+  // =========================
+  // MARCAR COMO TOMADO
+  // =========================
 
-  // =========================
-  // ABRIR EDICIÓN
-  // =========================
+  const handleMarkTaken = async (medicationId) => {
+    try {
+      setMarkingId(medicationId);
+
+      await markDoseTaken(medicationId);
+
+      setTakenToday((current) => new Set(current).add(medicationId));
+    } catch (error) {
+      console.error("Error al marcar la toma:", error);
+      alert(error.message || "No se pudo registrar la toma.");
+    } finally {
+      setMarkingId(null);
+    }
+  };
+
+  // ... (handleEdit, handleSaveEdit, handleDelete se quedan exactamente igual)
 
   const handleEdit = (medication) => {
     setEditingMedication(medication);
-
     setEditName(medication.name || "");
     setEditDosage(medication.dosage || "");
     setEditFrequency(medication.frequency || "");
   };
 
-
-  // =========================
-  // GUARDAR EDICIÓN
-  // =========================
-
   const handleSaveEdit = async (e) => {
     e.preventDefault();
-
     if (!editName || !editDosage || !editFrequency) {
       alert("Completá todos los campos.");
       return;
     }
-
     try {
       setSaving(true);
-
       await updateMedication(editingMedication.id, {
         name: editName,
         dosage: editDosage,
         description: editingMedication.description || "",
         frequency: editFrequency,
       });
-
-      console.log("Medicamento editado correctamente");
-
       setEditingMedication(null);
-
       await loadMedications();
-
     } catch (error) {
-      console.error("Error al editar:", error);
-
-      alert(
-        error.message || "No se pudo editar el medicamento."
-      );
-
+      alert(error.message || "No se pudo editar el medicamento.");
     } finally {
       setSaving(false);
     }
   };
 
-
-  // =========================
-  // ELIMINAR
-  // =========================
-
   const handleDelete = async (id) => {
     const confirmar = window.confirm(
       "¿Estás seguro/a de que querés eliminar este medicamento?"
     );
-
-    if (!confirmar) {
-      return;
-    }
+    if (!confirmar) return;
 
     try {
       await deleteMedication(id);
-
-      console.log("Medicamento eliminado");
-
-      // Lo sacamos de la pantalla sin tener que recargar
       setMedications((current) =>
         current.filter((medication) => medication.id !== id)
       );
-
     } catch (error) {
-      console.error("Error al eliminar:", error);
-
-      alert(
-        error.message || "No se pudo eliminar el medicamento."
-      );
+      alert(error.message || "No se pudo eliminar el medicamento.");
     }
   };
 
-
   return (
     <div className="medications">
-
       <header className="medications-header">
-
-        <button
-          className="back-button"
-          onClick={() => navigate("/dashboard")}
-        >
+        <button className="back-button" onClick={() => navigate("/dashboard")}>
           ←
         </button>
-
         <h1>Mis medicamentos</h1>
-
       </header>
 
-
       <main className="medications-content">
-
         <div className="medications-title">
           <div>
             <p>Organizá tus medicamentos</p>
@@ -169,272 +143,121 @@ function Medications() {
           </div>
         </div>
 
-
-        {/* CARGANDO */}
-
         {loading && (
           <div className="empty-medications">
-            <div className="medication-icon">
-              💊
-            </div>
-
+            <div className="medication-icon">💊</div>
             <p>Cargando medicamentos...</p>
           </div>
         )}
 
-
-        {/* ERROR */}
-
         {!loading && error && (
           <div className="empty-medications">
-
-            <div className="medication-icon">
-              ⚠️
-            </div>
-
+            <div className="medication-icon">⚠️</div>
             <h3>No se pudieron cargar los medicamentos</h3>
-
             <p>{error}</p>
-
           </div>
         )}
 
-
-        {/* SIN MEDICAMENTOS */}
-
-        {!loading &&
-          !error &&
-          medications.length === 0 && (
-
+        {!loading && !error && medications.length === 0 && (
           <div className="empty-medications">
-
-            <div className="medication-icon">
-              💊
-            </div>
-
+            <div className="medication-icon">💊</div>
             <h3>No tenés medicamentos registrados</h3>
-
-            <p>
-              Agregá tus medicamentos para poder
-              recibir recordatorios y alertas.
-            </p>
-
-            <button
-              className="primary-button"
-              onClick={() => navigate("/add-medication")}
-            >
+            <p>Agregá tus medicamentos para poder recibir recordatorios y alertas.</p>
+            <button className="primary-button" onClick={() => navigate("/add-medication")}>
               + Agregar medicamento
             </button>
-
           </div>
         )}
 
-
-        {/* LISTA */}
-
-        {!loading &&
-          !error &&
-          medications.length > 0 && (
-
+        {!loading && !error && medications.length > 0 && (
           <div className="medications-list">
+            {medications.map((medication) => {
+              const isTaken = takenToday.has(medication.id);
 
-            {medications.map((medication) => (
+              return (
+                <div className="medication-card" key={medication.id}>
+                  <div className="medication-card-info">
+                    <div className="medication-card-icon">💊</div>
 
-              <div
-                className="medication-card"
-                key={medication.id}
-              >
+                    <div>
+                      <h3>{medication.name}</h3>
+                      <p>Dosis: {medication.dosage}</p>
+                      <p>Frecuencia: {medication.frequency}</p>
 
-                <div className="medication-card-info">
-
-                  <div className="medication-card-icon">
-                    💊
+                      {medication.schedules && medication.schedules.length > 0 && (
+                        <p>Horario: {medication.schedules[0].hour}</p>
+                      )}
+                    </div>
                   </div>
 
-                  <div>
+                  <div className="medication-card-actions">
+                    <button
+                      className={isTaken ? "taken-button taken" : "taken-button"}
+                      disabled={isTaken || markingId === medication.id}
+                      onClick={() => handleMarkTaken(medication.id)}
+                    >
+                      {isTaken
+                        ? "✓ Tomado"
+                        : markingId === medication.id
+                        ? "Guardando..."
+                        : "Ya la tomé"}
+                    </button>
 
-                    <h3>{medication.name}</h3>
-
-                    <p>
-                      Dosis: {medication.dosage}
-                    </p>
-
-                    <p>
-                      Frecuencia: {medication.frequency}
-                    </p>
-
-                    {medication.schedules &&
-                      medication.schedules.length > 0 && (
-
-                      <p>
-                        Horario:{" "}
-                        {medication.schedules[0].hour}
-                      </p>
-
-                    )}
-
+                    <button onClick={() => handleEdit(medication)}>Editar</button>
+                    <button onClick={() => handleDelete(medication.id)}>Eliminar</button>
                   </div>
-
                 </div>
-
-
-                <div className="medication-card-actions">
-
-                  <button
-                    onClick={() => handleEdit(medication)}
-                  >
-                    Editar
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      handleDelete(medication.id)
-                    }
-                  >
-                    Eliminar
-                  </button>
-
-                </div>
-
-              </div>
-
-            ))}
-
+              );
+            })}
           </div>
         )}
 
-
-        {/* AGREGAR */}
-
-        {!loading &&
-          !error &&
-          medications.length > 0 && (
-
+        {!loading && !error && medications.length > 0 && (
           <button
             className="primary-button add-medication-button"
             onClick={() => navigate("/add-medication")}
           >
             + Agregar medicamento
           </button>
-
         )}
-
-
-        {/* =========================
-            FORMULARIO DE EDICIÓN
-        ========================= */}
 
         {editingMedication && (
-
           <div className="edit-medication">
-
             <h2>Editar medicamento</h2>
-
             <form onSubmit={handleSaveEdit}>
-
               <div className="form-group">
-
-                <label>
-                  Nombre del medicamento
-                </label>
-
-                <input
-                  type="text"
-                  value={editName}
-                  onChange={(e) =>
-                    setEditName(e.target.value)
-                  }
-                />
-
+                <label>Nombre del medicamento</label>
+                <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
               </div>
 
-
               <div className="form-group">
-
-                <label>
-                  Dosis
-                </label>
-
-                <input
-                  type="text"
-                  value={editDosage}
-                  onChange={(e) =>
-                    setEditDosage(e.target.value)
-                  }
-                />
-
+                <label>Dosis</label>
+                <input type="text" value={editDosage} onChange={(e) => setEditDosage(e.target.value)} />
               </div>
 
-
               <div className="form-group">
-
-                <label>
-                  Frecuencia
-                </label>
-
-                <select
-                  value={editFrequency}
-                  onChange={(e) =>
-                    setEditFrequency(e.target.value)
-                  }
-                >
-
-                  <option value="">
-                    Seleccioná una frecuencia
-                  </option>
-
-                  <option value="Una vez al día">
-                    Una vez al día
-                  </option>
-
-                  <option value="Dos veces al día">
-                    Dos veces al día
-                  </option>
-
-                  <option value="Tres veces al día">
-                    Tres veces al día
-                  </option>
-
-                  <option value="Otra">
-                    Otra
-                  </option>
-
+                <label>Frecuencia</label>
+                <select value={editFrequency} onChange={(e) => setEditFrequency(e.target.value)}>
+                  <option value="">Seleccioná una frecuencia</option>
+                  <option value="Una vez al día">Una vez al día</option>
+                  <option value="Dos veces al día">Dos veces al día</option>
+                  <option value="Tres veces al día">Tres veces al día</option>
+                  <option value="Otra">Otra</option>
                 </select>
-
               </div>
-
 
               <div className="edit-buttons">
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setEditingMedication(null)
-                  }
-                >
+                <button type="button" onClick={() => setEditingMedication(null)}>
                   Cancelar
                 </button>
-
-                <button
-                  type="submit"
-                  className="primary-button"
-                  disabled={saving}
-                >
-                  {saving
-                    ? "Guardando..."
-                    : "Guardar cambios"}
+                <button type="submit" className="primary-button" disabled={saving}>
+                  {saving ? "Guardando..." : "Guardar cambios"}
                 </button>
-
               </div>
-
             </form>
-
           </div>
-
         )}
-
       </main>
-
     </div>
   );
 }

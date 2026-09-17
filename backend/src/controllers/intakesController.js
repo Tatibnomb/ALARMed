@@ -39,7 +39,11 @@ const createIntake = async (req, res) => {
 
     const { data, error } = await supabase
         .from("intakes")
-        .insert([{ medication_id, taken }])
+        .insert([{
+            medication_id,
+            taken,
+            taken_at: new Date().toISOString()
+        }])
         .select();
 
     if (error) {
