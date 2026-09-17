@@ -7,7 +7,7 @@ const schedulesRoutes = require("./routes/schedulesRoutes");
 const intakesRoutes = require("./routes/intakesRoutes");
 const statsRoutes = require("./routes/statsRoutes");
 const authRoutes = require("./routes/authRoutes");
-// const warningsRoutes = require("./routes/warningsRoutes");
+const warningsRoutes = require("./routes/warningsRoutes");
 
 const app = express();
 
@@ -25,6 +25,7 @@ console.log("schedulesRoutes:", typeof schedulesRoutes);
 console.log("intakesRoutes:", typeof intakesRoutes);
 console.log("statsRoutes:", typeof statsRoutes);
 console.log("authRoutes:", typeof authRoutes);
+console.log("warningsRoutes:", typeof warningsRoutes);
 
 app.use("/users", usersRoutes);
 app.use("/medications", medicationsRoutes);
@@ -32,6 +33,6 @@ app.use("/schedules", schedulesRoutes);
 app.use("/intakes", intakesRoutes);
 app.use("/stats", statsRoutes);
 app.use("/auth", authRoutes);
-// app.use("/warnings", warningsRoutes);
+app.use("/warnings", warningsRoutes);
 
 module.exports = app;
