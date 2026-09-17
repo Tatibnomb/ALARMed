@@ -244,3 +244,32 @@ export const getTodayIntakes = async () => {
       new Date(intake.taken_at) >= startOfDay
   );
 };
+
+// =========================
+// EDITAR HORARIO
+// =========================
+
+export const updateSchedule = async (id, hour) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("No hay una sesión iniciada");
+  }
+
+  const response = await fetch(`${API_URL}/schedules/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ hour }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Error al editar el horario");
+  }
+
+  return data;
+};

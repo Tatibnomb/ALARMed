@@ -8,6 +8,7 @@ import {
   deleteMedication,
   markDoseTaken,
   getTodayIntakes,
+  updateSchedule,
 } from "../services/api";
 
 function Medications() {
@@ -26,6 +27,7 @@ function Medications() {
   const [editDosage, setEditDosage] = useState("");
   const [editFrequency, setEditFrequency] = useState("");
   const [saving, setSaving] = useState(false);
+  const [editHour, setEditHour] = useState("");
 
   // =========================
   // CARGAR MEDICAMENTOS + TOMAS DE HOY
@@ -85,6 +87,11 @@ function Medications() {
     setEditName(medication.name || "");
     setEditDosage(medication.dosage || "");
     setEditFrequency(medication.frequency || "");
+    setEditHour(
+      medication.schedules && medication.schedules.length > 0
+        ? medication.schedules[0].hour.slice(0, 5) // "10:00:00" -> "10:00"
+        : ""
+    );
   };
 
   const handleSaveEdit = async (e) => {
@@ -95,12 +102,22 @@ function Medications() {
     }
     try {
       setSaving(true);
+
       await updateMedication(editingMedication.id, {
         name: editName,
         dosage: editDosage,
         description: editingMedication.description || "",
         frequency: editFrequency,
       });
+
+      if (
+        editHour &&
+        editingMedication.schedules &&
+        editingMedication.schedules.length > 0
+      ) {
+        await updateSchedule(editingMedication.schedules[0].id, editHour);
+      }
+
       setEditingMedication(null);
       await loadMedications();
     } catch (error) {
