@@ -1,90 +1,86 @@
-:root {
-  --primary: #4c5cf0;
-  --primary-dark: #3a48d1;
-  --accent-coral: #f4645f;
-  --teal: #0f6e73;
-  --teal-dark: #0a5257;
-}
-
 .dashboard {
   min-height: 100vh;
-  background: linear-gradient(180deg, #a8b3ea 0%, #d8b9dd 50%, #f2c9d6 100%);
-  padding-bottom: 32px;
+  background: #f4f6f8;
+  color: #222;
+  padding-bottom: 30px;
 }
 
+/* HEADER */
+
 .dashboard-header {
-  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  background: #1f7a8c;
   color: white;
-  padding: 24px 20px 32px;
-  border-bottom-left-radius: 24px;
-  border-bottom-right-radius: 24px;
+  padding: 30px 25px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  border-radius: 0 0 25px 25px;
 }
 
 .dashboard-welcome {
   margin: 0;
-  opacity: 0.85;
-  font-size: 0.9rem;
+  font-size: 15px;
+  opacity: 0.9;
 }
 
 .dashboard-header h1 {
-  margin: 4px 0 0;
-  font-size: 1.6rem;
+  margin: 5px 0 0;
+  font-size: 28px;
 }
 
 .dashboard-user {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
+  width: 45px;
+  height: 45px;
   background: white;
+  color: #1f7a8c;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 22px;
 }
+
+/* CONTENIDO */
 
 .dashboard-content {
-  padding: 20px;
+  padding: 25px 20px;
 }
 
-.dashboard-summary h2,
-.dashboard-section h2 {
-  margin: 0 0 12px;
-  font-size: 1.15rem;
-  color: #1f1f2e;
+.dashboard-content h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
 }
+
+/* RESUMEN */
 
 .summary-cards {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 .summary-card {
-  flex: 1;
   background: white;
-  border-radius: 16px;
-  padding: 16px 8px;
+  border-radius: 15px;
+  padding: 15px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  box-shadow: 0 4px 12px rgba(76, 92, 240, 0.12);
+  gap: 5px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .summary-number {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
+  font-size: 24px;
+  font-weight: bold;
+  color: #1f7a8c;
 }
 
+/* SECCIONES */
+
 .dashboard-section {
-  background: white;
-  border-radius: 20px;
-  padding: 18px;
-  box-shadow: 0 6px 18px rgba(76, 92, 240, 0.1);
+  margin-top: 30px;
 }
 
 .section-title {
@@ -93,98 +89,34 @@
   align-items: center;
 }
 
+.section-title h2 {
+  margin: 0;
+}
+
 .section-title button {
-  background: none;
   border: none;
-  color: var(--primary);
+  background: none;
+  color: #1f7a8c;
   font-weight: 600;
   cursor: pointer;
 }
+
+/* ESTADO VACÍO */
 
 .empty-state {
-  text-align: center;
-  padding: 24px 8px;
-  color: #6b7280;
-}
-
-.primary-button {
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 999px;
-  padding: 12px 24px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.primary-button:hover {
-  background: var(--primary-dark);
-}
-
-.upcoming-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.upcoming-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: #f7f7fc;
-}
-
-.upcoming-name {
-  margin: 0;
-  font-weight: 600;
-  color: #1f1f2e;
-}
-
-.upcoming-dosage {
-  margin: 2px 0 0;
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-.upcoming-time {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 0.8rem;
-  color: #6b7280;
-  min-width: 70px;
-}
-
-.upcoming-time strong {
-  color: #1f1f2e;
-  font-size: 0.95rem;
-}
-
-.taken-button {
-  border: 1.5px solid var(--primary);
-  color: var(--primary);
   background: white;
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
+  border-radius: 18px;
+  padding: 30px 20px;
+  text-align: center;
+  margin-top: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.taken-button:hover:not(:disabled) {
-  background: var(--primary);
-  color: white;
+.empty-state p {
+  color: #666;
+  margin-bottom: 20px;
 }
 
-.taken-button.taken {
-  background: #d7f7e6;
-  border-color: #14b871;
-  color: #0a7a4a;
-  cursor: default;
+.empty-state .primary-button {
+  width: 100%;
 }

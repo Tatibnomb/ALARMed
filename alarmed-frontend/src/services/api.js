@@ -22,7 +22,13 @@ export const loginUser = async (email, password) => {
       throw new Error(data.message || "Error al intentar iniciar sesión.");
     }
 
+<<<<<<< HEAD
     // 3. Guardamos el token en localStorage si viene en la respuesta
+=======
+    const data = await response.json();
+
+    // Guardamos el token de Supabase dentro de la función antes de retornar
+>>>>>>> parent of c2509e3 (Merge branch 'front')
     if (data.session?.access_token) {
       localStorage.setItem("token", data.session.access_token);
     }
@@ -35,7 +41,7 @@ export const loginUser = async (email, password) => {
 };
 
 // =========================
-// CREAR MEDICAMENTO
+// MEDICAMENTOS
 // =========================
 
 export const createMedication = async ({
@@ -95,203 +101,4 @@ export const fetchMedicationsWithWarnings = async (userId) => {
     console.error("Error en fetchMedicationsWithWarnings:", error);
     return [];
   }
-};
-
-// =========================
-// OBTENER MEDICAMENTOS
-// =========================
-
-export const getMedications = async () => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    throw new Error("No hay una sesión iniciada");
-  }
-
-  const response = await fetch(`${API_URL}/medications`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.message || "Error al obtener los medicamentos"
-    );
-  }
-
-  return data;
-};
-
-
-// =========================
-// EDITAR MEDICAMENTO
-// =========================
-
-export const updateMedication = async (
-  id,
-  { name, dosage, description, frequency }
-) => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    throw new Error("No hay una sesión iniciada");
-  }
-
-  const response = await fetch(`${API_URL}/medications/${id}`, {
-    method: "PUT",
-
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-
-    body: JSON.stringify({
-      name,
-      dosage,
-      description,
-      frequency,
-    }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.message || "Error al editar el medicamento"
-    );
-  }
-
-  return data;
-};
-
-
-// =========================
-// ELIMINAR MEDICAMENTO
-// =========================
-
-export const deleteMedication = async (id) => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    throw new Error("No hay una sesión iniciada");
-  }
-
-  const response = await fetch(`${API_URL}/medications/${id}`, {
-    method: "DELETE",
-
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.message || "Error al eliminar el medicamento"
-    );
-  }
-
-  return data;
-};
-
-// =========================
-// MARCAR TOMA COMO HECHA
-// =========================
-
-export const markDoseTaken = async (medicationId) => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    throw new Error("No hay una sesión iniciada");
-  }
-
-  const response = await fetch(`${API_URL}/intakes`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      medication_id: medicationId,
-      taken: true,
-    }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Error al registrar la toma");
-  }
-
-  return data;
-};
-
-// =========================
-// TOMAS DE HOY
-// =========================
-
-export const getTodayIntakes = async () => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    throw new Error("No hay una sesión iniciada");
-  }
-
-  const response = await fetch(`${API_URL}/intakes`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Error al obtener las tomas");
-  }
-
-  // Filtramos acá las que son de hoy y están marcadas como tomadas
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-
-  return data.filter(
-    (intake) =>
-      intake.taken === true &&
-      intake.taken_at &&
-      new Date(intake.taken_at) >= startOfDay
-  );
-};
-
-// =========================
-// EDITAR HORARIO
-// =========================
-
-export const updateSchedule = async (id, hour) => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    throw new Error("No hay una sesión iniciada");
-  }
-
-  const response = await fetch(`${API_URL}/schedules/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ hour }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Error al editar el horario");
-  }
-
-  return data;
 };

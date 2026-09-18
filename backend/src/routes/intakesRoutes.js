@@ -8,8 +8,8 @@ const {
     getMedicationHistory
 } = require("../controllers/intakesController");
 
-router.get("/", authMiddleware, getIntakes);
-router.post("/", authMiddleware, createIntake);
-router.get("/history/:id", authMiddleware, getMedicationHistory);
+router.get("/", getIntakes);
+router.post("/", createIntake);
+router.get("/history/:id", getMedicationHistory);
 
 module.exports = router;
