@@ -1,35 +1,39 @@
-const API_URL = "http://192.168.56.1:3000";
+const API_URL = "http://localhost:3000";
 
 // =========================
 // LOGIN
 // =========================
 
 export const loginUser = async (email, password) => {
-  const response = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
-  });
+  try {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  const data = await response.json();
+    // Validamos primero si el servidor respondió con un OK (código 200)
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error del servidor (no JSON):", errorText);
+      throw new Error("Error en el servidor al intentar iniciar sesión");
+    }
 
-  if (!response.ok) {
-    throw new Error(data.message || "Error al iniciar sesión");
+    const data = await response.json();
+
+    // Guardamos el token de Supabase dentro de la función antes de retornar
+    if (data.session?.access_token) {
+      localStorage.setItem("token", data.session.access_token);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error en loginUser:", error);
+    throw error;
   }
-
-  // Guardamos el token de Supabase
-  if (data.session?.access_token) {
-    localStorage.setItem("token", data.session.access_token);
-  }
-
-  return data;
 };
-
 
 // =========================
 // MEDICAMENTOS
@@ -45,33 +49,51 @@ export const createMedication = async ({
   const token = localStorage.getItem("token");
 
   if (!token) {
-    throw new Error("No hay una sesión iniciada");
+    throw new Error("No hay una sesión iniciada. Por favor, iniciá sesión de nuevo.");
   }
 
-  const response = await fetch(`${API_URL}/medications`, {
+  const response = await fetch("http://localhost:3000/medications", {
     method: "POST",
-
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`, // Debe coincidir con lo que espera authMiddleware
     },
-
     body: JSON.stringify({
       name,
       dosage,
-      description,
+      description: description || "",
       frequency,
       hour,
     }),
   });
 
-  const data = await response.json();
-
+  // Si el backend da error (ej. 401, 403, 500)
   if (!response.ok) {
-    throw new Error(
-      data.message || "Error al guardar el medicamento"
-    );
+    const errorText = await response.text();
+    console.error("Respuesta de error del servidor:", errorText);
+    
+    // Intentamos ver si la respuesta traía un mensaje
+    try {
+      const errorJson = JSON.parse(errorText);
+      throw new Error(errorJson.message || "Error al guardar el medicamento.");
+    } catch (e) {
+      throw new Error(`Error en el servidor (${response.status}). Revisa la consola del backend.`);
+    }
   }
 
-  return data;
+  return await response.json();
+};
+
+export const fetchMedicationsWithWarnings = async (userId) => {
+  try {
+    const response = await fetch(`${API_URL}/api/medications/${userId}`);
+    if (!response.ok) {
+      throw new Error("Error al obtener los medicamentos");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error en fetchMedicationsWithWarnings:", error);
+    return [];
+  }
 };

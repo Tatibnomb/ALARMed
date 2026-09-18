@@ -1,7 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/add-medication.css";
-
 import { createMedication } from "../services/api";
 
 function AddMedication() {
@@ -16,14 +15,13 @@ function AddMedication() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-
   const handleCreate = async (e) => {
     e.preventDefault();
 
     setError("");
     setMessage("");
 
-    // Validar campos
+    // Validar campos obligatorios
     if (!name || !dosage || !frequency || !hour) {
       setError("Completá todos los campos.");
       return;
@@ -32,7 +30,6 @@ function AddMedication() {
     try {
       setLoading(true);
 
-      // Guardamos el medicamento en el backend
       const medication = await createMedication({
         name,
         dosage,
@@ -41,207 +38,112 @@ function AddMedication() {
         hour,
       });
 
-      console.log("Medicamento y horario guardados:", medication);
-
+      console.log("Medicamento guardado:", medication);
       setMessage("¡Medicamento guardado correctamente!");
 
-      // Limpiamos el formulario
+      // Limpieza de campos
       setName("");
       setDosage("");
       setFrequency("");
       setHour("");
 
-      // Esperamos un momento y volvemos a medicamentos
+      // Redirección con retraso para permitir leer el mensaje de éxito
       setTimeout(() => {
         navigate("/medications");
-      }, 1000);
+      }, 1200);
 
-    } catch (error) {
-      console.error("Error al guardar medicamento:", error);
-
-      setError(
-        error.message || "No se pudo guardar el medicamento."
-      );
-
+    } catch (err) {
+      console.error("Error al guardar medicamento:", err);
+      setError(err.message || "No se pudo guardar el medicamento.");
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
     <div className="add-medication">
-
       <header className="add-medication-header">
-
         <button
           className="back-button"
           onClick={() => navigate("/medications")}
         >
           ←
         </button>
-
         <h1>Agregar medicamento</h1>
-
       </header>
 
-
       <main className="add-medication-content">
-
         <div className="form-intro">
-
           <h2>Nuevo medicamento</h2>
-
-          <p>
-            Completá los datos para agregar un medicamento
-            a tu lista.
-          </p>
-
+          <p>Completá los datos para agregar un medicamento a tu lista.</p>
         </div>
 
-
-        <form
-          className="medication-form"
-          onSubmit={handleCreate}
-        >
-
+        <form className="medication-form" onSubmit={handleCreate}>
           {/* NOMBRE */}
-
           <div className="form-group">
-
-            <label>
-              Nombre del medicamento
-            </label>
-
+            <label htmlFor="name">Nombre del medicamento</label>
             <input
+              id="name"
               type="text"
               placeholder="Ej. Paracetamol"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-
           </div>
 
-
           {/* DOSIS */}
-
           <div className="form-group">
-
-            <label>
-              Dosis
-            </label>
-
+            <label htmlFor="dosage">Dosis</label>
             <input
+              id="dosage"
               type="text"
               placeholder="Ej. 500 mg"
               value={dosage}
               onChange={(e) => setDosage(e.target.value)}
             />
-
           </div>
 
-
           {/* FRECUENCIA */}
-
           <div className="form-group">
-
-            <label>
-              Frecuencia
-            </label>
-
+            <label htmlFor="frequency">Frecuencia</label>
             <select
+              id="frequency"
               value={frequency}
               onChange={(e) => setFrequency(e.target.value)}
             >
-
-              <option value="">
-                Seleccioná una frecuencia
-              </option>
-
-              <option value="Una vez al día">
-                Una vez al día
-              </option>
-
-              <option value="Dos veces al día">
-                Dos veces al día
-              </option>
-
-              <option value="Tres veces al día">
-                Tres veces al día
-              </option>
-
-              <option value="Otra">
-                Otra
-              </option>
-
+              <option value="">Seleccioná una frecuencia</option>
+              <option value="Una vez al día">Una vez al día</option>
+              <option value="Dos veces al día">Dos veces al día</option>
+              <option value="Tres veces al día">Tres veces al día</option>
+              <option value="Otra">Otra</option>
             </select>
-
           </div>
 
-
           {/* HORARIO */}
-
           <div className="form-group">
-
-            <label>
-              Horario de toma
-            </label>
-
+            <label htmlFor="hour">Horario de toma</label>
             <input
+              id="hour"
               type="time"
               value={hour}
               onChange={(e) => setHour(e.target.value)}
             />
-
           </div>
 
+          {/* MENSAJES DE ESTADO */}
+          {error && <p className="error-message">{error}</p>}
+          {message && <p className="success-message">{message}</p>}
 
-          {/* MENSAJE DE ERROR */}
-
-          {error && (
-            <p
-              style={{
-                color: "#d93025",
-                marginTop: "10px",
-                textAlign: "center",
-              }}
-            >
-              {error}
-            </p>
-          )}
-
-
-          {/* MENSAJE DE ÉXITO */}
-
-          {message && (
-            <p
-              style={{
-                color: "#188038",
-                marginTop: "10px",
-                textAlign: "center",
-              }}
-            >
-              {message}
-            </p>
-          )}
-
-
-          {/* BOTÓN */}
-
+          {/* BOTÓN SUBMIT */}
           <button
             type="submit"
             className="primary-button save-medication-button"
             disabled={loading}
           >
-            {loading
-              ? "Guardando..."
-              : "Guardar medicamento"}
+            {loading ? "Guardando..." : "Guardar medicamento"}
           </button>
-
         </form>
-
       </main>
-
     </div>
   );
 }

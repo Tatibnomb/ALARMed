@@ -1,29 +1,29 @@
-const supabase = require("../config/supabase");
+const { supabase } = require("../config/supabase");
 
-module.exports = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
 
-    const token = req.headers.authorization?.replace("Bearer ", ""); // Busca algo como esto: eyJhbGciOi...
-    // y se queda solo con el token del proyecto en Supabase
-
-    console.log("TOKEN RECIBIDO:", token);
-
-    if (!token) { // Si no encuentra el token
-        return res.status(401).json({
-            message: "Token no proporcionado"
-        });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Token no proporcionado o inválido." });
     }
 
-    const { data, error } = await supabase.auth.getUser(token); // Consulta a Supabase
+    const token = authHeader.split(" ")[1];
 
-    if (error) { // Si el token no es válido
-        return res.status(401).json({
-            message: "Token inválido"
-        });
+    // Validamos el token utilizando Supabase Auth
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      return res.status(401).json({ message: "Sesión inválida o expirada." });
     }
-// Si todo está bien...
-    req.user = data.user; // Guarda el usuario autenticado para que los controladores puedan
-    // usarlo más adelante.
 
+    // Adjuntamos la información del usuario a la request
+    req.user = user;
     next();
-
+  } catch (err) {
+    console.error("Error en authMiddleware:", err);
+    return res.status(500).json({ message: "Error al autenticar la petición." });
+  }
 };
+
+module.exports = authMiddleware;
