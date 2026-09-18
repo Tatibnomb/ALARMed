@@ -80,7 +80,8 @@
   padding: 12px 14px;
   border-radius: 12px;
   border: 2px solid transparent;
-  background: #eef0fb;
+  border-left: 4px solid var(--primary);
+  background: #dde2fb; /* tinte azul más visible */
   font-size: 0.9rem;
   font-family: "Nunito", sans-serif;
   box-sizing: border-box;
@@ -91,6 +92,7 @@
 .form-group select:focus {
   outline: none;
   border-color: var(--primary);
+  border-left-color: var(--primary);
   background: white;
 }
 

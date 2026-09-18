@@ -64,7 +64,6 @@
 
 .summary-card {
   flex: 1;
-  background: white;
   border-radius: 16px;
   padding: 16px 8px;
   display: flex;
@@ -72,12 +71,32 @@
   align-items: center;
   gap: 4px;
   box-shadow: 0 4px 12px rgba(76, 92, 240, 0.12);
+  background: linear-gradient(135deg, rgba(76, 92, 240, 0.12), rgba(76, 92, 240, 0.03));
+  border: 1px solid rgba(76, 92, 240, 0.25);
+}
+
+.summary-card:nth-child(2) {
+  background: linear-gradient(135deg, rgba(15, 110, 115, 0.12), rgba(15, 110, 115, 0.03));
+  border-color: rgba(15, 110, 115, 0.25);
+}
+
+.summary-card:nth-child(3) {
+  background: linear-gradient(135deg, rgba(244, 100, 95, 0.12), rgba(244, 100, 95, 0.03));
+  border-color: rgba(244, 100, 95, 0.25);
 }
 
 .summary-number {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary);
+}
+
+.summary-card:nth-child(2) .summary-number {
+  color: var(--teal);
+}
+
+.summary-card:nth-child(3) .summary-number {
+  color: var(--accent-coral);
 }
 
 .dashboard-section {
@@ -135,7 +154,13 @@
   gap: 8px;
   padding: 14px 16px;
   border-radius: 14px;
-  background: #f7f7fc;
+  background: linear-gradient(135deg, rgba(76, 92, 240, 0.1), rgba(76, 92, 240, 0.02));
+  border: 1px solid rgba(76, 92, 240, 0.2);
+}
+
+.upcoming-item:nth-child(even) {
+  background: linear-gradient(135deg, rgba(244, 100, 95, 0.1), rgba(244, 100, 95, 0.02));
+  border-color: rgba(244, 100, 95, 0.2);
 }
 
 .upcoming-name {

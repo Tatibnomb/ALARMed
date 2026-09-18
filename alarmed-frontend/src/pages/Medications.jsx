@@ -263,6 +263,15 @@ function Medications() {
                 </select>
               </div>
 
+              <div className="form-group">
+                <label>Horario de toma</label>
+                <input
+                  type="time"
+                  value={editHour}
+                  onChange={(e) => setEditHour(e.target.value)}
+                />
+              </div>
+
               <div className="edit-buttons">
                 <button type="button" onClick={() => setEditingMedication(null)}>
                   Cancelar
