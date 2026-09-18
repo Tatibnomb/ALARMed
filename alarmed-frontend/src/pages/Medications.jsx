@@ -1,121 +1,74 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
-=======
-import React, { useEffect, useState } from "react";
->>>>>>> parent of c2509e3 (Merge branch 'front')
 import { useNavigate } from "react-router-dom";
 import "../styles/medications.css";
-
-<<<<<<< HEAD
-// Importás directamente desde tu api.js
 import { getMedications, deleteMedication } from "../services/api";
 
 function Medications() {
-=======
-function Medications({ userId }) {
->>>>>>> parent of c2509e3 (Merge branch 'front')
   const navigate = useNavigate();
   const [medications, setMedications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-<<<<<<< HEAD
-    // Ejecutás la función exportada en api.js
-    getMedications()
-      .then((data) => {
-        setMedications(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("¿Eliminar este medicamento?")) return;
-    try {
-      await deleteMedication(id); // Llamada a api.js
-      setMedications(medications.filter((med) => med.id !== id));
-    } catch (err) {
-      alert("Error al eliminar");
-=======
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadMedications = async () => {
     try {
       setLoading(true);
-      const data = await fetchMedicationsWithWarnings(userId);
-      setMedications(data || []);
-    } catch (error) {
-      console.error("Error al cargar medicamentos:", error);
+      setError("");
+      const data = await getMedications();
+      setMedications(data);
+    } catch (err) {
+      console.error("Error al obtener medicamentos:", err);
+      setError("No se pudieron cargar los medicamentos.");
     } finally {
       setLoading(false);
     }
   };
 
-  const getSeverityColor = (severity) => {
-    switch (severity) {
-      case "urgente": return "#FF3B30";
-      case "importante": return "#FF9500";
-      case "precaucion": return "#FFCC00";
-      default: return "#007AFF";
->>>>>>> parent of c2509e3 (Merge branch 'front')
+  useEffect(() => {
+    loadMedications();
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("¿Estás seguro de eliminar este medicamento?")) return;
+
+    try {
+      await deleteMedication(id);
+      setMedications((prev) => prev.filter((med) => med.id !== id));
+    } catch (err) {
+      console.error("Error al eliminar:", err);
+      alert("No se pudo eliminar el medicamento.");
     }
   };
 
   return (
     <div className="medications">
       <header className="medications-header">
-<<<<<<< HEAD
-        <button className="back-button" onClick={() => navigate("/dashboard")}>←</button>
-=======
-        <button
-          className="back-button"
-          onClick={() => navigate("/dashboard")}
-        >
+        <button className="back-button" onClick={() => navigate("/dashboard")}>
           ←
         </button>
->>>>>>> parent of c2509e3 (Merge branch 'front')
         <h1>Mis medicamentos</h1>
       </header>
 
       <main className="medications-content">
-        {loading ? (
-          <p>Cargando...</p>
-        ) : medications.length === 0 ? (
-          <div className="empty-medications">
-            <div className="medication-icon">💊</div>
-            <h3>No tenés medicamentos registrados</h3>
-            <button className="primary-button" onClick={() => navigate("/add-medication")}>
-              + Agregar medicamento
+        <div className="medications-title">
+          <div>
+            <p>Organizá tus medicamentos</p>
+            <h2>Medicamentos</h2>
+          </div>
+          {medications.length > 0 && (
+            <button
+              className="primary-button"
+              onClick={() => navigate("/add-medication")}
+            >
+              + Agregar
             </button>
-          </div>
-<<<<<<< HEAD
-        ) : (
-          <div className="medications-list">
-            {medications.map((med) => (
-              <div key={med.id} className="medication-card">
-                <div>
-                  <h3>{med.name}</h3>
-                  <p><strong>Dosis:</strong> {med.dosage}</p>
-                  <p><strong>Frecuencia:</strong> {med.frequency}</p>
-                  {med.schedules?.length > 0 && (
-                    <p><strong>Horario:</strong> {med.schedules.map((s) => s.hour).join(", ")}</p>
-                  )}
-                </div>
-                <button onClick={() => handleDelete(med.id)}>Eliminar</button>
-              </div>
-            ))}
-          </div>
-=======
+          )}
         </div>
 
-        {loading ? (
-          <p>Cargando medicamentos...</p>
-        ) : medications.length === 0 ? (
-          /* Estado vacío (Tu diseño original) */
+        {loading && <p className="loading-text">Cargando medicamentos...</p>}
+
+        {error && <p className="error-message">{error}</p>}
+
+        {!loading && !error && medications.length === 0 && (
           <div className="empty-medications">
             <div className="medication-icon">💊</div>
             <h3>No tenés medicamentos registrados</h3>
@@ -129,33 +82,35 @@ function Medications({ userId }) {
               + Agregar medicamento
             </button>
           </div>
-        ) : (
-          /* Lista de medicamentos con advertencias (Adaptado a Web) */
-          <div className="medications-list">
-            {medications.map((item) => (
-              <div key={item.id} className="medication-card">
-                <h3>{item.name} ({item.dosage})</h3>
-                <p>{item.frequency} - {item.schedule}</p>
+        )}
 
-                {/* Renderizado de Advertencias */}
-                {item.warning_medications?.map(({ warnings }) => (
-                  <div
-                    key={warnings.id}
-                    className="warning-box"
-                    style={{ borderColor: getSeverityColor(warnings.severity) }}
+        {!loading && !error && medications.length > 0 && (
+          <div className="medications-list">
+            {medications.map((med) => (
+              <div key={med.id} className="medication-card">
+                <div className="medication-info">
+                  <h3>{med.name}</h3>
+                  <p><strong>Dosis:</strong> {med.dosage}</p>
+                  <p><strong>Frecuencia:</strong> {med.frequency}</p>
+                  {med.schedules && med.schedules.length > 0 && (
+                    <p>
+                      <strong>Horario:</strong>{" "}
+                      {med.schedules.map((s) => s.hour).join(", ")}
+                    </p>
+                  )}
+                </div>
+
+                <div className="medication-actions">
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDelete(med.id)}
                   >
-                    <strong style={{ color: getSeverityColor(warnings.severity) }}>
-                      [{warnings.severity.toUpperCase()}] {warnings.title}
-                    </strong>
-                    <p className="warning-message">{warnings.message}</p>
-                    <p className="warning-recommendation">💡 {warnings.recommendation}</p>
-                    <small className="warning-source">Fuente: {warnings.source}</small>
-                  </div>
-                ))}
+                    Eliminar
+                  </button>
+                </div>
               </div>
             ))}
           </div>
->>>>>>> parent of c2509e3 (Merge branch 'front')
         )}
       </main>
     </div>
