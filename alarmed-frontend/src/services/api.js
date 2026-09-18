@@ -14,17 +14,18 @@ export const loginUser = async (email, password) => {
       body: JSON.stringify({ email, password }),
     });
 
-    // Validamos primero si el servidor respondió con un OK (código 200)
+    // 1. Convertimos la respuesta en JSON
+    const data = await response.json();
+
+    // 2. Validamos si el servidor respondió con un error HTTP
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Error del servidor (no JSON):", errorText);
-      throw new Error("Error en el servidor al intentar iniciar sesión");
+      throw new Error(data.message || "Error al intentar iniciar sesión.");
     }
 
-  // Guardamos el token de Supabase
-  if (data.session?.access_token) {
-    localStorage.setItem("token", data.session.access_token);
-  }
+    // 3. Guardamos el token en localStorage si viene en la respuesta
+    if (data.session?.access_token) {
+      localStorage.setItem("token", data.session.access_token);
+    }
 
     return data;
   } catch (error) {
