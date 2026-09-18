@@ -57,7 +57,44 @@ const createSchedule = async (req, res) => {
     res.status(201).json(data);
 };
 
+const updateSchedule = async (req, res) => {
+
+    const { id } = req.params;
+    const { hour } = req.body;
+
+    const { data: schedule, error: findError } = await supabase
+        .from("schedules")
+        .select("medication_id")
+        .eq("id", id)
+        .single();
+
+    if (findError) {
+        return res.status(500).json(findError);
+    }
+
+    const owns = await medicationBelongsToUser(schedule.medication_id, req.user.id);
+
+    if (!owns) {
+        return res.status(403).json({
+            message: "No podés editar el horario de un medicamento que no te pertenece"
+        });
+    }
+
+    const { data, error } = await supabase
+        .from("schedules")
+        .update({ hour })
+        .eq("id", id)
+        .select();
+
+    if (error) {
+        return res.status(500).json(error);
+    }
+
+    res.json(data);
+};
+
 module.exports = {
     getSchedules,
-    createSchedule
+    createSchedule,
+    updateSchedule
 };

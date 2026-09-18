@@ -1,71 +1,208 @@
+:root {
+  --primary: #4c5cf0;
+  --primary-dark: #3a48d1;
+  --accent-coral: #f4645f;
+  --teal: #0f6e73;
+  --teal-dark: #0a5257;
+}
+
 .medications {
   min-height: 100vh;
-  background: #f4f6f8;
-  color: #222;
+  background: linear-gradient(180deg, #a8b3ea 0%, #d8b9dd 50%, #f2c9d6 100%);
+  padding-bottom: 32px;
 }
 
 .medications-header {
-  background: #1f7a8c;
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
   color: white;
-  padding: 25px 20px;
+  padding: 20px;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
   display: flex;
   align-items: center;
-  gap: 15px;
-  border-radius: 0 0 25px 25px;
+  gap: 12px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
 }
 
 .medications-header h1 {
   margin: 0;
-  font-size: 24px;
-}
-
-.back-button {
-  border: none;
-  background: transparent;
-  color: white;
-  font-size: 28px;
-  cursor: pointer;
+  font-size: 1.3rem;
 }
 
 .medications-content {
-  padding: 25px 20px;
+  padding: 20px;
 }
 
 .medications-title p {
   margin: 0;
-  color: #777;
-  font-size: 14px;
+  color: #6b7280;
+  font-size: 0.85rem;
 }
 
 .medications-title h2 {
-  margin-top: 5px;
-  font-size: 22px;
+  margin: 2px 0 20px;
+  color: #1f1f2e;
 }
 
 .empty-medications {
   background: white;
   border-radius: 20px;
-  padding: 35px 20px;
-  margin-top: 25px;
+  padding: 32px 20px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 18px rgba(76, 92, 240, 0.1);
 }
 
 .medication-icon {
-  font-size: 50px;
-  margin-bottom: 15px;
+  font-size: 2.2rem;
+  margin-bottom: 8px;
 }
 
-.empty-medications h3 {
-  margin-bottom: 10px;
+.medications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.empty-medications p {
-  color: #666;
-  line-height: 1.5;
-  margin-bottom: 25px;
+.medication-card {
+  background: white;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(76, 92, 240, 0.1);
 }
 
-.empty-medications .primary-button {
+.medication-card-info {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.medication-card-icon {
+  font-size: 1.6rem;
+}
+
+.medication-card-info h3 {
+  margin: 0 0 4px;
+  color: #1f1f2e;
+}
+
+.medication-card-info p {
+  margin: 2px 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.medication-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.medication-card-actions button {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.medication-card-actions button:not(.taken-button) {
+  background: #eef0fb;
+  color: #3a3a55;
+}
+
+.medication-card-actions button:nth-of-type(3) {
+  background: #fde7e6;
+  color: var(--accent-coral);
+}
+
+.taken-button {
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.taken-button:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+}
+
+.taken-button.taken {
+  background: #d7f7e6;
+  border-color: #14b871;
+  color: #0a7a4a;
+  cursor: default;
+}
+
+.add-medication-button {
   width: 100%;
+  margin-top: 20px;
+}
+
+.edit-medication {
+  margin-top: 20px;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 6px 18px rgba(76, 92, 240, 0.12);
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  color: var(--teal-dark);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: #eef0fb; /* tinte azul suave, como el botón "Registrarse" */
+  font-size: 0.9rem;
+  font-family: "Nunito", sans-serif;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.edit-buttons button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-buttons button[type="button"] {
+  background: #eef0fb;
+  color: #3a3a55;
 }
