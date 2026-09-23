@@ -68,4 +68,149 @@
 
 .empty-medications .primary-button {
   width: 100%;
+.medication-card {
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(76, 92, 240, 0.12);
+  background: linear-gradient(135deg, rgba(76, 92, 240, 0.12), rgba(76, 92, 240, 0.03));
+  border: 1px solid rgba(76, 92, 240, 0.25);
+}}
+
+.medication-card:nth-child(even) {
+  background: linear-gradient(135deg, rgba(244, 100, 95, 0.12), rgba(244, 100, 95, 0.03));
+  border-color: rgba(244, 100, 95, 0.25);
+}
+
+.medication-card-info {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.medication-card-icon {
+  font-size: 1.6rem;
+}
+
+.medication-card-info h3 {
+  color: #1f1f2e;
+}
+
+.medication-card-info p {
+  color: #55556b;
+}
+
+.medication-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.medication-card-actions button {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.medication-card-actions button:not(.taken-button) {
+  background: var(--primary);
+  color: white;
+  border: none;
+}
+
+.medication-card-actions button:not(.taken-button):hover {
+  background: var(--primary-dark);
+}
+
+.medication-card-actions button:nth-of-type(3) {
+  background: var(--accent-coral);
+  color: white;
+}
+
+.medication-card-actions button:nth-of-type(3):hover {
+  background: #d9433e;
+}
+
+.taken-button {
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  background: white;
+}
+
+.taken-button:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+}
+
+.taken-button.taken {
+  background: #d7f7e6;
+  border-color: #14b871;
+  color: #0a7a4a;
+}
+
+.add-medication-button {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.edit-medication {
+  margin-top: 20px;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 6px 18px rgba(76, 92, 240, 0.12);
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  color: var(--teal-dark);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: #eef0fb; /* tinte azul suave, como el botón "Registrarse" */
+  font-size: 0.9rem;
+  font-family: "Nunito", sans-serif;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.edit-buttons button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-buttons button[type="button"] {
+  background: #ecd9fa;
+  color: #3a3a55;
 }

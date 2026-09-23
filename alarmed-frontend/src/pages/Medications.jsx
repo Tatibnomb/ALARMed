@@ -63,6 +63,7 @@ function Medications() {
             </button>
           )}
         </div>
+        </main>
 
         {loading && <p className="loading-text">Cargando medicamentos...</p>}
 
@@ -110,11 +111,43 @@ function Medications() {
                 </div>
               </div>
             ))}
-          </div>
+
+              <div className="form-group">
+                <label>Dosis</label>
+                <input type="text" value={editDosage} onChange={(e) => setEditDosage(e.target.value)} />
+              </div>
+
+              <div className="form-group">
+                <label>Frecuencia</label>
+                <select value={editFrequency} onChange={(e) => setEditFrequency(e.target.value)}>
+                  <option value="">Seleccioná una frecuencia</option>
+                  <option value="Una vez al día">Una vez al día</option>
+                  <option value="Dos veces al día">Dos veces al día</option>
+                  <option value="Tres veces al día">Tres veces al día</option>
+                  <option value="Otra">Otra</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Horario de toma</label>
+                <input
+                  type="time"
+                  value={editHour}
+                  onChange={(e) => setEditHour(e.target.value)}
+                />
+              </div>
+
+              <div className="edit-buttons">
+                <button type="button" onClick={() => setEditingMedication(null)}>
+                  Cancelar
+                </button>
+                <button type="submit" className="primary-button" disabled={saving}>
+                  {saving ? "Guardando..." : "Guardar cambios"}
+                </button>
+              </div>
+            </form>
+            </div>
         )}
       </main>
-    </div>
-  );
-}
 
 export default Medications;
