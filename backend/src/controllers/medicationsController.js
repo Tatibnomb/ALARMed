@@ -136,13 +136,3 @@ module.exports = {
     updateMedication,
     deleteMedication
 };
-const { generateWarningsForUser } = require("../services/warningsService");
-
-// dentro de createMedication, después de crear el schedule con éxito:
-await generateWarningsForUser(req.user.id);
-
-// dentro de updateMedication, después del update:
-await generateWarningsForUser(req.user.id);
-
-// dentro de deleteMedication, después del delete:
-await generateWarningsForUser(req.user.id);

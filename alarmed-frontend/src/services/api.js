@@ -273,10 +273,3 @@ export const updateSchedule = async (id, hour) => {
 
   return data;
 };
-
-export const getWarnings = async () => {
-  const response = await fetch(`${API_URL}/warnings`, {
-    headers: await getAuthHeaders(),
-  });
-  return response.json();
-};
