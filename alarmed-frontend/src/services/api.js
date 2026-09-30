@@ -1,39 +1,38 @@
-const API_URL = "http://192.168.56.1:3000";
+const API_URL = "http://localhost:3000";
 
 // =========================
 // LOGIN
 // =========================
-
 export const loginUser = async (email, password) => {
-  const response = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
-  });
+  try {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (!response.ok) {
-    throw new Error(data.message || "Error al iniciar sesión");
+    if (!response.ok) {
+      throw new Error(data.message || "Error al intentar iniciar sesión.");
+    }
+
+    if (data.session?.access_token) {
+      localStorage.setItem("token", data.session.access_token);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error en loginUser:", error);
+    throw error;
   }
-
-  if (data.session?.access_token) {
-    localStorage.setItem("token", data.session.access_token);
-  }
-
-  return data;
 };
-
 
 // =========================
 // CREAR MEDICAMENTO
 // =========================
-
 export const createMedication = async ({
   name,
   dosage,
@@ -44,41 +43,54 @@ export const createMedication = async ({
   const token = localStorage.getItem("token");
 
   if (!token) {
-    throw new Error("No hay una sesión iniciada");
+    throw new Error("No hay una sesión iniciada. Por favor, iniciá sesión de nuevo.");
   }
 
   const response = await fetch(`${API_URL}/medications`, {
     method: "POST",
-
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-
     body: JSON.stringify({
       name,
       dosage,
-      description,
+      description: description || "",
       frequency,
       hour,
     }),
   });
 
-  const data = await response.json();
-
   if (!response.ok) {
-    throw new Error(
-      data.message || "Error al guardar el medicamento"
-    );
+    const errorText = await response.text();
+    console.error("Respuesta de error del servidor:", errorText);
+    try {
+      const errorJson = JSON.parse(errorText);
+      throw new Error(errorJson.message || "Error al guardar el medicamento.");
+    } catch (e) {
+      throw new Error(`Error en el servidor (${response.status}). Revisa la consola del backend.`);
+    }
   }
 
-  return data;
+  return await response.json();
+};
+
+export const fetchMedicationsWithWarnings = async (userId) => {
+  try {
+    const response = await fetch(`${API_URL}/api/medications/${userId}`);
+    if (!response.ok) {
+      throw new Error("Error al obtener los medicamentos");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error en fetchMedicationsWithWarnings:", error);
+    return [];
+  }
 };
 
 // =========================
 // OBTENER MEDICAMENTOS
 // =========================
-
 export const getMedications = async () => {
   const token = localStorage.getItem("token");
 
@@ -96,19 +108,15 @@ export const getMedications = async () => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      data.message || "Error al obtener los medicamentos"
-    );
+    throw new Error(data.message || "Error al obtener los medicamentos");
   }
 
   return data;
 };
 
-
 // =========================
 // EDITAR MEDICAMENTO
 // =========================
-
 export const updateMedication = async (
   id,
   { name, dosage, description, frequency }
@@ -121,12 +129,10 @@ export const updateMedication = async (
 
   const response = await fetch(`${API_URL}/medications/${id}`, {
     method: "PUT",
-
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-
     body: JSON.stringify({
       name,
       dosage,
@@ -138,19 +144,15 @@ export const updateMedication = async (
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      data.message || "Error al editar el medicamento"
-    );
+    throw new Error(data.message || "Error al editar el medicamento");
   }
 
   return data;
 };
 
-
 // =========================
 // ELIMINAR MEDICAMENTO
 // =========================
-
 export const deleteMedication = async (id) => {
   const token = localStorage.getItem("token");
 
@@ -160,7 +162,6 @@ export const deleteMedication = async (id) => {
 
   const response = await fetch(`${API_URL}/medications/${id}`, {
     method: "DELETE",
-
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -169,9 +170,7 @@ export const deleteMedication = async (id) => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      data.message || "Error al eliminar el medicamento"
-    );
+    throw new Error(data.message || "Error al eliminar el medicamento");
   }
 
   return data;
@@ -180,7 +179,6 @@ export const deleteMedication = async (id) => {
 // =========================
 // MARCAR TOMA COMO HECHA
 // =========================
-
 export const markDoseTaken = async (medicationId) => {
   const token = localStorage.getItem("token");
 
@@ -212,7 +210,6 @@ export const markDoseTaken = async (medicationId) => {
 // =========================
 // TOMAS DE HOY
 // =========================
-
 export const getTodayIntakes = async () => {
   const token = localStorage.getItem("token");
 
@@ -233,7 +230,6 @@ export const getTodayIntakes = async () => {
     throw new Error(data.message || "Error al obtener las tomas");
   }
 
-  // Filtramos acá las que son de hoy y están marcadas como tomadas
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
 
@@ -248,7 +244,6 @@ export const getTodayIntakes = async () => {
 // =========================
 // EDITAR HORARIO
 // =========================
-
 export const updateSchedule = async (id, hour) => {
   const token = localStorage.getItem("token");
 
