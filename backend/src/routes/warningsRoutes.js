@@ -1,11 +1,11 @@
 const express = require("express");
-
 const router = express.Router();
-
 const {
-    getWarnings
+  syncUserWarnings,
+  getUserMedicationsWithWarnings
 } = require("../controllers/warningsController");
 
-router.get("/:id", getWarnings);
+router.post("/sync/:userId", syncUserWarnings);
+router.get("/user/:userId", getUserMedicationsWithWarnings);
 
 module.exports = router;
