@@ -1,12 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-    register,
-    login
-} = require("../controllers/authController");
+// Importamos desestructurando { login } desde el controlador
+const { login } = require("../controllers/authController");
 
-router.post("/register", register);
+// Verificamos que 'login' no sea undefined
 router.post("/login", login);
 
 module.exports = router;
