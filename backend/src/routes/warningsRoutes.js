@@ -4,8 +4,9 @@ const {
   syncUserWarnings,
   getUserMedicationsWithWarnings
 } = require("../controllers/warningsController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-router.post("/sync/:userId", syncUserWarnings);
-router.get("/user/:userId", getUserMedicationsWithWarnings);
+router.post("/sync", authMiddleware, syncUserWarnings);
+router.get("/", authMiddleware, getUserMedicationsWithWarnings);
 
 module.exports = router;

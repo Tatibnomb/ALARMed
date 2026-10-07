@@ -1,13 +1,8 @@
 const dotenv = require("dotenv");
 dotenv.config(); // Carga las variables desde el archivo .env
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleGenAI } = require("@google/genai");
 
 const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) throw new Error("GEMINI_API_KEY no está definida en el .env");
 
-if (!apiKey) {
-  throw new Error("GEMINI_API_KEY no está definida en las variables de entorno.");
-}
-
-const genAI = new GoogleGenerativeAI(apiKey);
-
-module.exports = genAI;
+module.exports = new GoogleGenAI({ apiKey });

@@ -1,13 +1,16 @@
 const supabase = require("../config/supabase"); // Ajusta la ruta a tu cliente de Supabase
 const { analyzeMedicationsWithGemini } = require("../services/geminiAnalyzer");
+const { syncWarningsForUser } = require("../services/warningsService");
 
 async function syncUserWarnings(req, res) {
   try {
-    const { userId } = req.params;
-
-    if (!userId) {
-      return res.status(400).json({ error: "El ID de usuario es requerido." });
-    }
+    const analysis = await syncWarningsForUser(req.user.id);
+    res.json({ message: "Advertencias sincronizadas correctamente.", data: analysis });
+  } catch (error) {
+    console.error("Error en syncUserWarnings:", error);
+    res.status(500).json({ error: "Error interno al procesar las advertencias." });
+  }
+}
 
     // 1. Obtener medicamentos activos
     const { data: medications, error: medError } = await supabase
@@ -69,15 +72,9 @@ async function syncUserWarnings(req, res) {
       data: analysisResult
     });
 
-  } catch (error) {
-    console.error("Error en syncUserWarnings:", error);
-    return res.status(500).json({ error: "Error interno al procesar las advertencias." });
-  }
-}
-
 async function getUserMedicationsWithWarnings(req, res) {
   try {
-    const { userId } = req.params;
+    const userId = req.user.id;
 
     const { data, error } = await supabase
       .from("medications")

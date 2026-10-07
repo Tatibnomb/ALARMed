@@ -8,6 +8,7 @@ const intakesRoutes = require("./routes/intakesRoutes");
 const statsRoutes = require("./routes/statsRoutes");
 const authRoutes = require("./routes/authRoutes");
 const warningsRoutes = require("./routes/warningsRoutes");
+const remindersRoutes = require("./routes/remindersRoutes");
 
 const app = express();
 
@@ -26,6 +27,7 @@ console.log("intakesRoutes:", typeof intakesRoutes);
 console.log("statsRoutes:", typeof statsRoutes);
 console.log("authRoutes:", typeof authRoutes);
 console.log("warningsRoutes:", typeof warningsRoutes);
+console.log("remindersRoutes:", typeof remindersRoutes);
 
 app.use("/users", usersRoutes);
 app.use("/medications", medicationsRoutes);
@@ -34,5 +36,6 @@ app.use("/intakes", intakesRoutes);
 app.use("/stats", statsRoutes);
 app.use("/auth", authRoutes);
 app.use("/warnings", warningsRoutes);
+app.use("/reminders", remindersRoutes);
 
 module.exports = app;

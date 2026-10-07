@@ -60,17 +60,17 @@ async function analyzeMedicationsWithGemini(medications) {
     return { medications_analyzed: [], warnings: [] };
   }
 
-const payloadToAnalyze = medications.map(m => ({
-    id: m.id,
-    nombre: m.name || m.nombre || "Sin nombre",
-    dosis: m.dosage || m.dosis || "No especificada",
-    frecuencia: m.frequency || m.frecuencia || "",
-    horario: m.schedule || m.horario || "",
-    descripcion: m.description || m.descripcion || ""
-  }));
+const payloadToAnalyze = medications.map((m) => ({
+  id: m.id,
+  nombre: m.name,
+  dosis: m.dosage,
+  frecuencia: m.frequency,
+  horarios: (m.schedules || []).map((s) => s.hour.slice(0, 5)),
+  descripcion: m.description,
+}));
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
     contents: [
       {
         role: "user",

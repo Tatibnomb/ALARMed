@@ -1,3 +1,4 @@
+const { parseIntervalHours, computeDoseHours } = require("../utils/schedule");
 const supabase = require("../config/supabase");
 
 const getMedications = async (req, res) => {
@@ -33,7 +34,7 @@ const createMedication = async (req, res) => {
       return res.status(401).json({ message: "No autorizado. Token no válido o ausente." });
     }
 
-    const { name, dosage, description, frequency, hour } = req.body;
+    const { name, dosage, description, frequency, hour, interval_hours } = req.body;
 
     // 2. Validar campos recibidos del frontend
     if (!name || !dosage || !frequency || !hour) {
@@ -68,15 +69,12 @@ const createMedication = async (req, res) => {
     const newMedication = medicationData[0];
     const medicationId = newMedication.id;
 
-    // 4. Crear el horario asociado en la tabla schedules
+    // 4. Crear todos los horarios del día
+    const hours = computeDoseHours(hour, parseIntervalHours(frequency, interval_hours));
+    // Crear el horario asociado en la tabla schedules
     const { data: scheduleData, error: scheduleError } = await supabase
       .from("schedules")
-      .insert([
-        {
-          medication_id: medicationId,
-          hour,
-        },
-      ])
+      .insert(hours.map((h) => ({ medication_id: medicationId, hour: h })))
       .select();
 
     if (scheduleError) {

@@ -10,6 +10,6 @@ const {
 
 router.get("/", authMiddleware, getIntakes);
 router.post("/", authMiddleware, createIntake);
-router.get("/history/:id", authMiddleware, getMedicationHistory);
+router.get("/medication/:id", authMiddleware, getMedicationHistory);
 
 module.exports = router;
