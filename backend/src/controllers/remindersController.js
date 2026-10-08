@@ -6,7 +6,7 @@ const GRACE_MINUTES = 60;
 const getTodayReminders = async (req, res) => {
   const { ymd, start, end } = todayRange();
 
-  const { data: meds, error } = await supabase
+  const { data: meds, error } = await req.supabase
     .from("medications")
     .select("id, name, dosage, schedules(id, hour)")
     .eq("user_id", req.user.id)
@@ -15,7 +15,7 @@ const getTodayReminders = async (req, res) => {
   if (error) return res.status(500).json({ message: error.message });
   if (meds.length === 0) return res.json([]);
 
-  const { data: intakes, error: intakesError } = await supabase
+  const { data: intakes, error: intakesError } = await req.supabase
     .from("intakes")
     .select("*")
     .in("medication_id", meds.map((m) => m.id))

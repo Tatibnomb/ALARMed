@@ -7,7 +7,7 @@ const getMedications = async (req, res) => {
       return res.status(401).json({ message: "Usuario no autenticado." });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await req.supabase
       .from("medications")
       .select(`
         *,
@@ -44,7 +44,7 @@ const createMedication = async (req, res) => {
     }
 
     // 3. Crear el medicamento en Supabase
-    const { data: medicationData, error: medicationError } = await supabase
+    const { data: medicationData, error: medicationError } = await req.supabase
       .from("medications")
       .insert([
         {
@@ -72,7 +72,7 @@ const createMedication = async (req, res) => {
     // 4. Crear todos los horarios del día
     const hours = computeDoseHours(hour, parseIntervalHours(frequency, interval_hours));
     // Crear el horario asociado en la tabla schedules
-    const { data: scheduleData, error: scheduleError } = await supabase
+    const { data: scheduleData, error: scheduleError } = await req.supabase
       .from("schedules")
       .insert(hours.map((h) => ({ medication_id: medicationId, hour: h })))
       .select();
@@ -105,7 +105,7 @@ const updateMedication = async (req, res) => {
     const { id } = req.params;
     const { name, dosage, description, frequency } = req.body;
 
-    const { data, error } = await supabase
+    const { data, error } = await req.supabase
       .from("medications")
       .update({
         name,
@@ -133,7 +133,7 @@ const deleteMedication = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { error } = await supabase
+    const { error } = await req.supabase
       .from("medications")
       .delete()
       .eq("id", id)

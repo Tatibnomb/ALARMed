@@ -260,10 +260,10 @@ export const updateSchedule = async (id, hour) => {
     body: JSON.stringify({ hour }),
   });
 
-  const data = await response.json();
+  const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error(data.message || "Error al editar el horario");
+    throw new Error(data?.message || `Error al editar el horario (${response.status})`);
   }
 
   return data;

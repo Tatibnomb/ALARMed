@@ -14,7 +14,7 @@ const getIntakes = async (req, res) => {
         return res.json([]);
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await req.supabase
         .from("intakes")
         .select("*")
         .in("medication_id", ids);
@@ -29,7 +29,7 @@ const getIntakes = async (req, res) => {
 const createIntake = async (req, res) => {
   const { medication_id, schedule_id, taken = true } = req.body;
 
-  const owns = await medicationBelongsToUser(medication_id, req.user.id);
+  const owns = await medicationBelongsToUser(req.supabase, medication_id, req.user.id);
   if (!owns) {
     return res.status(403).json({
       message: "No podés registrar una toma de un medicamento que no te pertenece",
@@ -38,7 +38,7 @@ const createIntake = async (req, res) => {
 
   if (schedule_id) {
     // El horario tiene que ser de ese medicamento
-    const { data: sched } = await supabase
+    const { data: sched } = await req.supabase
       .from("schedules")
       .select("id")
       .eq("id", schedule_id)
@@ -49,7 +49,7 @@ const createIntake = async (req, res) => {
 
     // Evitar duplicar la toma del mismo horario en el día
     const { start, end } = todayRange();
-    const { data: existing } = await supabase
+    const { data: existing } = await req.supabase
       .from("intakes")
       .select("id")
       .eq("schedule_id", schedule_id)
@@ -62,7 +62,7 @@ const createIntake = async (req, res) => {
     }
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await req.supabase
     .from("intakes")
     .insert([{
       medication_id,
@@ -80,7 +80,7 @@ const getMedicationHistory = async (req, res) => {
 
     const { id } = req.params;
 
-    const owns = await medicationBelongsToUser(id, req.user.id);
+    const owns = await medicationBelongsToUser(req.supabase, id, req.user.id);
 
     if (!owns) {
         return res.status(403).json({
@@ -88,7 +88,7 @@ const getMedicationHistory = async (req, res) => {
         });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await req.supabase
         .from("intakes")
         .select("*")
         .eq("medication_id", id);

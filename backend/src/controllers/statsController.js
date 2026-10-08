@@ -6,6 +6,7 @@ const getAdherence = async (req, res) => {
     const { id } = req.params;
 
     const owns = await medicationBelongsToUser(
+        req.supabase,
         id,
         req.user.id
     );
@@ -16,7 +17,7 @@ const getAdherence = async (req, res) => {
         });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await req.supabase
         .from("intakes")
         .select("*")
         .eq("medication_id", id);

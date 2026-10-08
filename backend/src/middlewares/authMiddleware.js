@@ -1,28 +1,34 @@
-const supabase = require("../config/supabase");
+const { createClient } = require("@supabase/supabase-js");
+const { supabase } = require("../config/supabase");
 
 const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "No se proporcionó token de autenticación." });
+      return res.status(401).json({ message: "Token no proporcionado o inválido." });
     }
 
     const token = authHeader.split(" ")[1];
 
-    // Verificar el token con Supabase Auth
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
-      return res.status(401).json({ message: "Token inválido o expirado." });
+      return res.status(401).json({ message: "Sesión inválida o expirada." });
     }
 
-    // Guardar los datos del usuario en req.user para los controladores subsiguientes
     req.user = user;
+
+    // Cliente que actúa como este usuario (RLS lo reconoce)
+    req.supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
     next();
   } catch (err) {
     console.error("Error en authMiddleware:", err);
-    return res.status(500).json({ message: "Error interno en la autenticación." });
+    return res.status(500).json({ message: "Error al autenticar la petición." });
   }
 };
 
