@@ -3,10 +3,10 @@ const { medicationBelongsToUser, getUserMedicationIds } = require("../utils/owne
 
 const getSchedules = async (req, res) => {
 
-    const { ids, error: idsError } = await getUserMedicationIds(req.user.id);
+    const { ids, error: idsError } = await getUserMedicationIds(req.supabase, req.user.id);
 
     if (idsError) {
-        return res.status(500).json(idsError);
+        return res.status(500).json({ message: idsError.message });
     }
 
     if (ids.length === 0) {
@@ -19,7 +19,7 @@ const getSchedules = async (req, res) => {
         .in("medication_id", ids);
 
     if (error) {
-        return res.status(500).json(error);
+        return res.status(500).json({ message: error.message });
     }
 
     res.json(data);

@@ -1,49 +1,83 @@
+
 const supabase = require("../config/supabase");
 const { analyzeMedicationsWithGemini } = require("./geminiAnalyzer");
 
 async function syncWarningsForUser(userId) {
-  const { data: medications, error } = await supabase
+  // 1. Obtenemos los medicamentos activos y sus horarios.
+  const { data: medications, error: medicationError } = await supabase
     .from("medications")
     .select("*, schedules(hour)")
     .eq("user_id", userId)
     .eq("is_active", true);
-  if (error) throw error;
 
-  // Si Gemini falla, se lanza el error antes de borrar las advertencias viejas
-  const analysis = await analyzeMedicationsWithGemini(medications);
+  if (medicationError) {
+    throw medicationError;
+  }
 
-  const validIds = new Set(medications.map((m) => m.id));
+  // 2. Analizamos los medicamentos ANTES de borrar advertencias anteriores.
+  // Si Gemini falla, la función se detiene y no borra las advertencias guardadas.
+  const analysis = await analyzeMedicationsWithGemini(medications || []);
 
-  await supabase.from("warnings").delete().eq("user_id", userId);
+  // 3. Guardamos los IDs reales para descartar identificadores inventados.
+  const validIds = new Set((medications || []).map((m) => m.id));
 
-  for (const w of analysis.warnings || []) {
-    const { data: row, error: insErr } = await supabase
+  // 4. Reemplazamos las advertencias anteriores del usuario.
+  const { error: deleteError } = await supabase
+    .from("warnings")
+    .delete()
+    .eq("user_id", userId);
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  // 5. Insertamos las nuevas advertencias.
+  for (const warning of analysis.warnings) {
+    const { data: row, error: insertError } = await supabase
       .from("warnings")
       .insert({
         user_id: userId,
-        type: w.type,
-        severity: w.severity,
-        title: w.title,
-        message: w.message,
-        recommendation: w.recommendation,
-        evidence_level: w.evidence_level,
-        source: w.source,
+        type: warning.type,
+        severity: warning.severity,
+        title: warning.title,
+        message: warning.message,
+        recommendation: warning.recommendation,
+        evidence_level: warning.evidence_level,
+        source: warning.source,
       })
       .select()
       .single();
-    if (insErr) throw insErr;
 
-    // Descartar IDs que Gemini pueda haber inventado
-    const links = (w.medication_ids || [])
+    if (insertError) {
+      throw insertError;
+    }
+
+    // Vinculamos la advertencia únicamente con medicamentos existentes.
+    const links = (warning.medication_ids || [])
       .filter((id) => validIds.has(id))
-      .map((id) => ({ warning_id: row.id, medication_id: id }));
+      .map((id) => ({
+        warning_id: row.id,
+        medication_id: id,
+      }));
 
-    if (links.length) {
-      const { error: relErr } = await supabase.from("warning_medications").insert(links);
-      if (relErr) console.error("Error vinculando advertencia:", relErr);
+    if (links.length > 0) {
+      const { error: relationError } = await supabase
+        .from("warning_medications")
+        .insert(links);
+
+      if (relationError) {
+        // Informamos del error para no ocultar una vinculación fallida.
+        console.error(
+          "Error al vincular una advertencia con medicamentos:",
+          relationError
+        );
+
+        throw relationError;
+      }
     }
   }
 
+  // 6. Devolvemos el análisis para que lo reciba el controlador.
   return analysis;
 }
 

@@ -224,10 +224,10 @@ export const getTodayIntakes = async () => {
     },
   });
 
-  const data = await response.json();
-
+  const data = await response.json().catch(() => null);
+  
   if (!response.ok) {
-    throw new Error(data.message || "Error al obtener las tomas");
+    throw new Error(data?.message || `Error al obtener las tomas (${response.status})`);
   }
 
   const startOfDay = new Date();
