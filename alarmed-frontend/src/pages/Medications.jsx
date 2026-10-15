@@ -26,8 +26,8 @@ function Medications() {
   const [editName, setEditName] = useState("");
   const [editDosage, setEditDosage] = useState("");
   const [editFrequency, setEditFrequency] = useState("");
-  const [saving, setSaving] = useState(false);
   const [editHour, setEditHour] = useState("");
+  const [saving, setSaving] = useState(false);
 
   // =========================
   // CARGAR MEDICAMENTOS + TOMAS DE HOY
@@ -80,7 +80,9 @@ function Medications() {
     }
   };
 
-  // ... (handleEdit, handleSaveEdit, handleDelete se quedan exactamente igual)
+  // =========================
+  // EDITAR
+  // =========================
 
   const handleEdit = (medication) => {
     setEditingMedication(medication);
@@ -96,10 +98,12 @@ function Medications() {
 
   const handleSaveEdit = async (e) => {
     e.preventDefault();
+
     if (!editName || !editDosage || !editFrequency) {
       alert("Completá todos los campos.");
       return;
     }
+
     try {
       setSaving(true);
 
@@ -126,6 +130,10 @@ function Medications() {
       setSaving(false);
     }
   };
+
+  // =========================
+  // ELIMINAR
+  // =========================
 
   const handleDelete = async (id) => {
     const confirmar = window.confirm(
@@ -179,8 +187,14 @@ function Medications() {
           <div className="empty-medications">
             <div className="medication-icon">💊</div>
             <h3>No tenés medicamentos registrados</h3>
-            <p>Agregá tus medicamentos para poder recibir recordatorios y alertas.</p>
-            <button className="primary-button" onClick={() => navigate("/add-medication")}>
+            <p>
+              Agregá tus medicamentos para poder recibir recordatorios y
+              alertas.
+            </p>
+            <button
+              className="primary-button"
+              onClick={() => navigate("/add-medication")}
+            >
               + Agregar medicamento
             </button>
           </div>
@@ -201,15 +215,23 @@ function Medications() {
                       <p>Dosis: {medication.dosage}</p>
                       <p>Frecuencia: {medication.frequency}</p>
 
-                      {medication.schedules && medication.schedules.length > 0 && (
-                        <p>Horario: {medication.schedules[0].hour}</p>
-                      )}
+                      {medication.schedules &&
+                        medication.schedules.length > 0 && (
+                          <p>
+                            Horario:{" "}
+                            {medication.schedules
+                              .map((s) => s.hour.slice(0, 5))
+                              .join(", ")}
+                          </p>
+                        )}
                     </div>
                   </div>
 
                   <div className="medication-card-actions">
                     <button
-                      className={isTaken ? "taken-button taken" : "taken-button"}
+                      className={
+                        isTaken ? "taken-button taken" : "taken-button"
+                      }
                       disabled={isTaken || markingId === medication.id}
                       onClick={() => handleMarkTaken(medication.id)}
                     >
@@ -220,8 +242,12 @@ function Medications() {
                         : "Ya la tomé"}
                     </button>
 
-                    <button onClick={() => handleEdit(medication)}>Editar</button>
-                    <button onClick={() => handleDelete(medication.id)}>Eliminar</button>
+                    <button onClick={() => handleEdit(medication)}>
+                      Editar
+                    </button>
+                    <button onClick={() => handleDelete(medication.id)}>
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               );
@@ -244,17 +270,28 @@ function Medications() {
             <form onSubmit={handleSaveEdit}>
               <div className="form-group">
                 <label>Nombre del medicamento</label>
-                <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                />
               </div>
 
               <div className="form-group">
                 <label>Dosis</label>
-                <input type="text" value={editDosage} onChange={(e) => setEditDosage(e.target.value)} />
+                <input
+                  type="text"
+                  value={editDosage}
+                  onChange={(e) => setEditDosage(e.target.value)}
+                />
               </div>
 
               <div className="form-group">
                 <label>Frecuencia</label>
-                <select value={editFrequency} onChange={(e) => setEditFrequency(e.target.value)}>
+                <select
+                  value={editFrequency}
+                  onChange={(e) => setEditFrequency(e.target.value)}
+                >
                   <option value="">Seleccioná una frecuencia</option>
                   <option value="Una vez al día">Una vez al día</option>
                   <option value="Dos veces al día">Dos veces al día</option>
@@ -273,10 +310,17 @@ function Medications() {
               </div>
 
               <div className="edit-buttons">
-                <button type="button" onClick={() => setEditingMedication(null)}>
+                <button
+                  type="button"
+                  onClick={() => setEditingMedication(null)}
+                >
                   Cancelar
                 </button>
-                <button type="submit" className="primary-button" disabled={saving}>
+                <button
+                  type="submit"
+                  className="primary-button"
+                  disabled={saving}
+                >
                   {saving ? "Guardando..." : "Guardar cambios"}
                 </button>
               </div>

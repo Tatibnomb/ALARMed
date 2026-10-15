@@ -1,50 +1,44 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMedications, getTodayIntakes, markDoseTaken } from "../services/api";
 import "../styles/dashboard.css";
-
-function getNextDoseDate(hourString) {
-  const [h, m] = hourString.split(":").map(Number);
-  const now = new Date();
-  const next = new Date();
-  next.setHours(h, m, 0, 0);
-  if (next <= now) {
-    next.setDate(next.getDate() + 1);
-  }
-  return next;
-}
-
-function formatTime(date) {
-  return date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
-}
-
-function formatDayLabel(date) {
-  const now = new Date();
-  const isToday = date.toDateString() === now.toDateString();
-  return isToday ? "Hoy " : "Mañana ";
-}
+import WarningCard from "../components/WarningCard";
+import {
+  getMedications,
+  getTodayIntakes,
+  markDoseTaken,
+  getWarnings,
+  syncWarnings,
+} from "../services/api";
 
 function Dashboard() {
   const navigate = useNavigate();
+
   const [medications, setMedications] = useState([]);
   const [takenToday, setTakenToday] = useState(new Set());
   const [markingId, setMarkingId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [warnings, setWarnings] = useState([]);
+  const [analyzing, setAnalyzing] = useState(false);
+
+  const loadWarnings = async () => {
+    try {
+      setWarnings(await getWarnings());
+    } catch (e) {
+      console.error("Advertencias:", e);
+    }
+  };
 
   const loadData = async () => {
     try {
-      const [medsData, intakesData] = await Promise.all([
+      const [meds, intakes] = await Promise.all([
         getMedications(),
         getTodayIntakes(),
       ]);
-      setMedications(medsData);
-      setTakenToday(new Set(intakesData.map((i) => i.medication_id)));
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      setMedications(meds);
+      setTakenToday(new Set(intakes.map((i) => i.medication_id)));
+    } catch (e) {
+      console.error("Dashboard:", e);
     }
+    loadWarnings();
   };
 
   useEffect(() => {
@@ -55,27 +49,38 @@ function Dashboard() {
     try {
       setMarkingId(medicationId);
       await markDoseTaken(medicationId);
-      setTakenToday((current) => new Set(current).add(medicationId));
-    } catch (err) {
-      alert(err.message || "No se pudo registrar la toma.");
+      setTakenToday((cur) => new Set(cur).add(medicationId));
+    } catch (e) {
+      alert(e.message || "No se pudo registrar la toma.");
     } finally {
       setMarkingId(null);
     }
   };
 
-  const upcomingDoses = medications
-  .flatMap((med) =>
-    (med.schedules || []).map((schedule) => ({
-      medicationId: med.id,
-      medicationName: med.name,
-      dosage: med.dosage,
-      nextDose: getNextDoseDate(schedule.hour),
-    }))
-  )
-  .filter((dose) => !takenToday.has(dose.medicationId))
-  .sort((a, b) => a.nextDose - b.nextDose);
+  const handleAnalyze = async () => {
+    try {
+      setAnalyzing(true);
+      await syncWarnings();
+      await loadWarnings();
+    } catch (e) {
+      alert(e.message || "No se pudo revisar las interacciones.");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
-  const nextThreeDoses = upcomingDoses.slice(0, 3);
+  // Una fila por cada horario de cada medicamento, ordenadas por hora
+  const doses = medications
+    .flatMap((m) =>
+      (m.schedules || []).map((s) => ({
+        key: s.id,
+        medication: m,
+        hour: s.hour.slice(0, 5),
+      }))
+    )
+    .sort((a, b) => a.hour.localeCompare(b.hour));
+
+  const pendingCount = medications.filter((m) => !takenToday.has(m.id)).length;
 
   return (
     <div className="dashboard">
@@ -96,11 +101,11 @@ function Dashboard() {
               <span>Medicamentos</span>
             </div>
             <div className="summary-card">
-              <span className="summary-number">{upcomingDoses.length}</span>
+              <span className="summary-number">{pendingCount}</span>
               <span>Próximas tomas</span>
             </div>
             <div className="summary-card">
-              <span className="summary-number">0</span>
+              <span className="summary-number">{warnings.length}</span>
               <span>Alertas</span>
             </div>
           </div>
@@ -108,47 +113,60 @@ function Dashboard() {
 
         <section className="dashboard-section">
           <div className="section-title">
+            <h2>Advertencias</h2>
+            <button onClick={handleAnalyze} disabled={analyzing}>
+              {analyzing ? "Analizando..." : "Revisar"}
+            </button>
+          </div>
+
+          {warnings.length === 0 ? (
+            <div className="empty-state">
+              <p>No hay advertencias por ahora.</p>
+            </div>
+          ) : (
+            <div className="warnings-list">
+              {warnings.map((w) => (
+                <WarningCard key={w.id} warning={w} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="dashboard-section dashboard-section-spaced">
+          <div className="section-title">
             <h2>Próximas tomas</h2>
             <button onClick={() => navigate("/medications")}>Ver todas</button>
           </div>
 
-          {loading ? (
-            <p>Cargando...</p>
-          ) : error ? (
-            <p>Ocurrió un error al cargar los medicamentos.</p>
-          ) : nextThreeDoses.length === 0 ? (
+          {doses.length === 0 ? (
             <div className="empty-state">
               <p>No hay medicamentos programados.</p>
-              <button className="primary-button" onClick={() => navigate("/add-medication")}>
+              <button
+                className="primary-button"
+                onClick={() => navigate("/add-medication")}
+              >
                 + Agregar medicamento
               </button>
             </div>
           ) : (
             <div className="upcoming-list">
-              {nextThreeDoses.map((dose, index) => {
-                const isTaken = takenToday.has(dose.medicationId);
+              {doses.map(({ key, medication, hour }) => {
+                const isTaken = takenToday.has(medication.id);
                 return (
-                  <div className="upcoming-item" key={index}>
+                  <div className="upcoming-item" key={key}>
                     <div>
-                      <p className="upcoming-name">{dose.medicationName}</p>
-                      <p className="upcoming-dosage">{dose.dosage}</p>
+                      <p className="upcoming-name">{medication.name}</p>
+                      <p className="upcoming-dosage">{medication.dosage}</p>
                     </div>
-
                     <div className="upcoming-time">
-                      <span>{formatDayLabel(dose.nextDose)}</span>
-                      <strong>{formatTime(dose.nextDose)}</strong>
+                      <strong>{hour}</strong>
                     </div>
-
                     <button
                       className={isTaken ? "taken-button taken" : "taken-button"}
-                      disabled={isTaken || markingId === dose.medicationId}
-                      onClick={() => handleMarkTaken(dose.medicationId)}
+                      disabled={isTaken || markingId === medication.id}
+                      onClick={() => handleMarkTaken(medication.id)}
                     >
-                      {isTaken
-                        ? "✓ Tomado"
-                        : markingId === dose.medicationId
-                        ? "..."
-                        : "Ya la tomé"}
+                      {isTaken ? "✓ Tomado" : "Ya la tomé"}
                     </button>
                   </div>
                 );

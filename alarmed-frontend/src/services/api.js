@@ -75,17 +75,50 @@ export const createMedication = async ({
   return await response.json();
 };
 
-export const fetchMedicationsWithWarnings = async (userId) => {
-  try {
-    const response = await fetch(`${API_URL}/api/medications/${userId}`);
-    if (!response.ok) {
-      throw new Error("Error al obtener los medicamentos");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error en fetchMedicationsWithWarnings:", error);
-    return [];
+export const getWarnings = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No hay una sesión iniciada");
+
+  const response = await fetch(`${API_URL}/warnings`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(data?.message || `Error al obtener advertencias (${response.status})`);
   }
+
+  // Una misma advertencia viene dentro de cada medicamento involucrado: la unificamos.
+  const byId = new Map();
+  for (const med of data.medications || []) {
+    for (const link of med.warning_medications || []) {
+      const w = link.warnings;
+      if (!w) continue;
+      if (!byId.has(w.id)) byId.set(w.id, { ...w, medications: [] });
+      byId.get(w.id).medications.push(med.name);
+    }
+  }
+
+  const order = { urgente: 0, importante: 1, precaucion: 2, info: 3 };
+  return [...byId.values()].sort(
+    (a, b) => (order[a.severity] ?? 9) - (order[b.severity] ?? 9)
+  );
+};
+
+export const syncWarnings = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No hay una sesión iniciada");
+
+  const response = await fetch(`${API_URL}/warnings/sync`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(data?.message || data?.error || "No se pudo analizar");
+  }
+  return data;
 };
 
 // =========================

@@ -1,4 +1,3 @@
-
 const { Type } = require("@google/genai");
 const ai = require("../config/gemini");
 
@@ -96,6 +95,42 @@ function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Modelo principal y, opcionalmente, uno de respaldo (se define en el .env).
+const MODELS = [
+  ...new Set(
+    [
+      process.env.GEMINI_MODEL || "gemini-3.5-flash-lite",
+      process.env.GEMINI_FALLBACK_MODEL,
+    ].filter(Boolean)
+  ),
+];
+
+// Llama a Gemini con un modelo y reintenta si el error es temporal.
+async function generateWithRetry(model, request, maxAttempts = 3) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await ai.models.generateContent({ ...request, model });
+    } catch (error) {
+      lastError = error;
+
+      if (!isTemporaryGeminiError(error) || attempt === maxAttempts) {
+        break;
+      }
+
+      const delayMs = 1000 * 2 ** (attempt - 1);
+      console.warn(
+        `Gemini (${model}) no está disponible. Reintento ${attempt + 1}/${maxAttempts} ` +
+          `en ${delayMs / 1000} segundos.`
+      );
+      await wait(delayMs);
+    }
+  }
+
+  throw lastError;
+}
+
 async function analyzeMedicationsWithGemini(medications) {
   if (!medications || medications.length === 0) {
     return {
@@ -104,7 +139,6 @@ async function analyzeMedicationsWithGemini(medications) {
     };
   }
 
-  // Preparamos los datos necesarios para el análisis.
   const payloadToAnalyze = medications.map((m) => ({
     id: m.id,
     nombre: m.name,
@@ -117,38 +151,36 @@ async function analyzeMedicationsWithGemini(medications) {
     descripcion: m.description,
   }));
 
-  const maxAttempts = 3;
-  let lastError;
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      const response = await ai.models.generateContent({
-        model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
-        contents: [
+  // Todo lo que no cambia entre modelos (el modelo se agrega en cada intento).
+  const request = {
+    contents: [
+      {
+        role: "user",
+        parts: [
           {
-            role: "user",
-            parts: [
-              {
-                text:
-                  "Analiza los medicamentos activos y genera las advertencias correspondientes. " +
-                  "Usa los IDs exactos recibidos.\n\n" +
-                  JSON.stringify(payloadToAnalyze, null, 2),
-              },
-            ],
+            text:
+              "Analiza los medicamentos activos y genera las advertencias correspondientes. " +
+              "Usa los IDs exactos recibidos.\n\n" +
+              JSON.stringify(payloadToAnalyze, null, 2),
           },
         ],
-        config: {
-          systemInstruction: SYSTEM_INSTRUCTION,
-          temperature: 0,
-          responseMimeType: "application/json",
-          responseSchema: warningAnalysisSchema,
-        },
-      });
+      },
+    ],
+    config: {
+      systemInstruction: SYSTEM_INSTRUCTION,
+      temperature: 0,
+      responseMimeType: "application/json",
+      responseSchema: warningAnalysisSchema,
+    },
+  };
 
-      // Si Gemini responde, convertimos su JSON en un objeto JavaScript.
+  let lastError;
+
+  for (const model of MODELS) {
+    try {
+      const response = await generateWithRetry(model, request);
       const analysis = JSON.parse(response.text);
 
-      // Verificamos que la respuesta tenga la estructura esperada.
       if (
         !analysis ||
         !Array.isArray(analysis.medications_analyzed) ||
@@ -161,24 +193,16 @@ async function analyzeMedicationsWithGemini(medications) {
     } catch (error) {
       lastError = error;
 
-      // Los errores permanentes no se solucionan repitiendo la petición.
-      if (!isTemporaryGeminiError(error) || attempt === maxAttempts) {
+      // Si el error no es temporal (key inválida, modelo inexistente, etc.),
+      // probar con otro modelo no sirve: se corta acá.
+      if (!isTemporaryGeminiError(error)) {
         break;
       }
 
-      // Esperamos 1 segundo y después 2 segundos antes de reintentar.
-      const delayMs = 1000 * 2 ** (attempt - 1);
-
-      console.warn(
-        `Gemini no está disponible. Reintento ${attempt + 1}/${maxAttempts} ` +
-          `en ${delayMs / 1000} segundos.`
-      );
-
-      await wait(delayMs);
+      console.warn(`Modelo ${model} saturado, probando el siguiente (si hay)...`);
     }
   }
 
-  // Si todos los intentos fallan, conservamos el error original.
   console.error("No se pudo completar el análisis con Gemini:", lastError);
   throw lastError;
 }

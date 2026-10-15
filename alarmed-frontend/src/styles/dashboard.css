@@ -7,7 +7,10 @@
 }
 
 .dashboard {
+  width: 100%;
+  max-width: 430px;
   min-height: 100vh;
+  overflow-x: hidden;
   background: linear-gradient(180deg, #a8b3ea 0%, #d8b9dd 50%, #f2c9d6 100%);
   padding-bottom: 32px;
 }
@@ -213,3 +216,113 @@
   color: #0a7a4a;
   cursor: default;
 }
+
+.dashboard-section-spaced { margin-top: 16px; }
+
+.warnings-list {
+  max-height: 210px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.warning-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff4e5;
+  border-left: 5px solid #f5a623;
+  border-radius: 12px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.warning-info { background: #e8f1ff; border-left-color: #4f74ff; }
+.warning-importante { background: #ffe9e6; border-left-color: #f4645f; }
+.warning-urgente { background: #ffd9d6; border-left-color: #c0261f; }
+
+.warning-icon { flex-shrink: 0; }
+
+.warning-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f1f2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.warning-toggle {
+  flex-shrink: 0;
+  border: none;
+  background: white;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teal);
+  cursor: pointer;
+}
+
+.warning-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.warning-modal {
+  width: 100%;
+  max-width: 380px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 18px;
+  border-left: 6px solid #f5a623;
+  overflow: hidden;
+}
+
+.warning-modal.warning-info { border-left-color: #4f74ff; }
+.warning-modal.warning-importante { border-left-color: #f4645f; }
+.warning-modal.warning-urgente { border-left-color: #c0261f; }
+
+.warning-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px 16px 10px;
+  overflow-wrap: anywhere;
+}
+
+.warning-modal-header strong { display: block; font-size: 16px; color: #1f1f2e; }
+.warning-level { font-size: 12px; color: #666; }
+
+.warning-close {
+  border: none;
+  background: #eee;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.warning-modal-body {
+  padding: 0 16px 16px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.warning-modal-body p { margin-bottom: 10px; }
+.warning-meta { font-size: 12px; color: #777; }
