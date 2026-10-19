@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import WarningCard from "../components/WarningCard";
+import useReminders from "../hooks/useReminders";
 import {
   getMedications,
   getTodayIntakes,
@@ -80,6 +81,8 @@ function Dashboard() {
     )
     .sort((a, b) => a.hour.localeCompare(b.hour));
 
+  const { dueDoses, permission, requestPermission } = useReminders(doses, takenToday);
+
   const pendingCount = medications.filter((m) => !takenToday.has(m.id)).length;
 
   return (
@@ -93,6 +96,25 @@ function Dashboard() {
       </header>
 
       <main className="dashboard-content">
+        {dueDoses.length > 0 && (
+          <section className="reminder-banner">
+            <strong>⏰ Tenés {dueDoses.length === 1 ? "una toma pendiente" : `${dueDoses.length} tomas pendientes`}</strong>
+            <ul>
+              {dueDoses.map((d) => (
+                <li key={d.key}>
+                  {d.medication.name} · {d.hour}
+                  <button onClick={() => handleMarkTaken(d.medication.id)}>Ya la tomé</button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {permission === "default" && (
+          <button className="enable-notifications" onClick={requestPermission}>
+            🔔 Activar avisos del navegador
+          </button>
+        )}
         <section className="dashboard-summary">
           <h2>Resumen de hoy</h2>
           <div className="summary-cards">
