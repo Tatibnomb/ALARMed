@@ -229,9 +229,7 @@ function Medications() {
 
                   <div className="medication-card-actions">
                     <button
-                      className={
-                        isTaken ? "taken-button taken" : "taken-button"
-                      }
+                      className={isTaken ? "taken-button taken" : "taken-button"}
                       disabled={isTaken || markingId === medication.id}
                       onClick={() => handleMarkTaken(medication.id)}
                     >

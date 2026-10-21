@@ -328,3 +328,30 @@ export const getMedicationHistory = async (id) => {
 
   return data;
 };
+
+// =========================
+// TODAS LAS TOMAS
+// =========================
+
+export const getIntakes = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("No hay una sesión iniciada");
+  }
+
+  const response = await fetch(`${API_URL}/intakes`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Error al obtener el historial");
+  }
+
+  return data;
+};

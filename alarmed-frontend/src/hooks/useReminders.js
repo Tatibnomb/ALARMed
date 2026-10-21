@@ -45,5 +45,5 @@ export default function useReminders(doses, takenToday) {
     setPermission(await Notification.requestPermission());
   };
 
-  return { dueDoses, permission, requestPermission };
+  return { now, dueDoses, permission, requestPermission };
 }

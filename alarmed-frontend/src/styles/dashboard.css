@@ -192,6 +192,13 @@
   font-size: 0.95rem;
 }
 
+.upcoming-more {
+  text-align: center;
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
 .taken-button {
   border: 1.5px solid var(--primary);
   color: var(--primary);
@@ -327,33 +334,60 @@
 .warning-modal-body p { margin-bottom: 10px; }
 .warning-meta { font-size: 12px; color: #777; }
 
-.reminder-banner {
-  background: #fff4e5;
-  border-left: 5px solid #f5a623;
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 16px;
-  font-size: 0.9rem;
-}
-
-.reminder-banner ul { list-style: none; margin: 8px 0 0; padding: 0; }
-
-.reminder-banner li {
+.reminder-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  padding: 4px 0;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1100;
 }
 
-.reminder-banner li button {
+.reminder-card {
+  width: 100%;
+  max-width: 340px;
+  background: white;
+  border-radius: 24px;
+  padding: 28px 22px 18px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  animation: reminder-pop 0.25s ease;
+}
+
+@keyframes reminder-pop {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.reminder-icon { font-size: 2.6rem; }
+
+.reminder-card h2 {
+  margin: 8px 0 14px;
+  font-size: 1.1rem;
+  color: #1f1f2e;
+  font-family: "Poppins", sans-serif;
+}
+
+.reminder-med {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.reminder-dosage { margin: 4px 0 20px; color: #6b7280; }
+
+.reminder-primary { width: 100%; padding: 14px; margin-bottom: 8px; }
+
+.reminder-secondary {
+  width: 100%;
+  background: none;
   border: none;
-  background: var(--primary);
-  color: white;
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 0.75rem;
+  color: #6b7280;
   font-weight: 600;
+  padding: 10px;
   cursor: pointer;
 }
 
@@ -367,4 +401,9 @@
   padding: 10px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.history-link {
+  width: 100%;
+  margin-top: 16px;
 }

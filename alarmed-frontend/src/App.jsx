@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Medications from "./pages/Medications";
 import AddMedication from "./pages/AddMedication";
+import History from "./pages/History";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/medications" element={<Medications />} />
           <Route path="/add-medication" element={<AddMedication />} />
+          <Route path="/history" element={<History />} />
         </Routes>
       </div>
     </BrowserRouter>
