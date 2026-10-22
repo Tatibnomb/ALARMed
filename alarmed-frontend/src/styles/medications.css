@@ -107,7 +107,6 @@
   gap: 8px;
 }
 
-/* Base de todos los botones de la tarjeta */
 .medication-card-actions button {
   border: none;
   border-radius: 999px;
@@ -117,7 +116,6 @@
   cursor: pointer;
 }
 
-/* Editar (y cualquier botón que no sea "Ya la tomé"): violeta */
 .medication-card-actions button:not(.taken-button) {
   background: #4c5cf0;
   color: white;
@@ -127,7 +125,6 @@
   background: #3a48d1;
 }
 
-/* Eliminar: coral (por clase o, si falta la clase, por posición) */
 .medication-card-actions button.delete-button,
 .medication-card-actions button:not(.taken-button):nth-of-type(3) {
   background: #f4645f;

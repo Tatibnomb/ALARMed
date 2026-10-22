@@ -62,9 +62,11 @@ function WarningCard({ warning }) {
               {warning.medications?.length > 0 && (
                 <p>
                   <strong>Medicamentos:</strong>{" "}
-                  {warning.medications.join(" + ")}
-                </p>
-              )}
+                  {warning.medications
+                  .map((m) => (typeof m === "object" ? m.name : m))
+                  .join(" + ")}
+                  </p>
+                )}
               <p>{warning.message}</p>
               <p>
                 <strong>Recomendación:</strong> {warning.recommendation}
