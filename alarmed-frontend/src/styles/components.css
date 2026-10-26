@@ -26,7 +26,7 @@
 
 .input-group label{
 
-    color:var(--text);
+    color:white;
 
     font-size:20px;
 
@@ -41,7 +41,7 @@
 
     border-radius:14px;
 
-    background:var(--input);
+    background:#B9B2DA;
 
     padding:18px;
 
@@ -55,36 +55,37 @@
     border:2px solid white;
 }
 
-.primary-button{
-
+.button{
     width:220px;
-
     height:52px;
 
-    margin:35px auto 0;
+    margin:20px auto 0;
 
     display:block;
 
     border:none;
-
     border-radius:14px;
-
-    background:var(--button);
 
     color:white;
 
     font-size:18px;
-
     font-weight:600;
 
     cursor:pointer;
 
-    transition:.2s;
+    transition:0.2s;
 }
 
-.primary-button:hover{
-
+.button:hover{
     transform:scale(1.03);
+}
+
+.primary{
+    background:#4B73FF;
+}
+
+.secondary{
+    background:#D98AA4;
 }
 
 .status-icons{

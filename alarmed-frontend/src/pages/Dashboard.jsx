@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import WarningCard from "../components/WarningCard";
+import useReminders from "../hooks/useReminders";
 import {
   getMedications,
   getTodayIntakes,
@@ -9,6 +10,19 @@ import {
   getWarnings,
   syncWarnings,
 } from "../services/api";
+
+const formatTime = (hhmm) => {
+  const [h, m] = hhmm.split(":").map(Number);
+  const d = new Date();
+  d.setHours(h, m, 0, 0);
+  return d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+};
+
+const minutesSince = (hhmm) => {
+  const [h, m] = hhmm.split(":").map(Number);
+  const d = new Date();
+  return d.getHours() * 60 + d.getMinutes() - (h * 60 + m);
+};
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -80,7 +94,18 @@ function Dashboard() {
     )
     .sort((a, b) => a.hour.localeCompare(b.hour));
 
-  const pendingCount = medications.filter((m) => !takenToday.has(m.id)).length;
+  const { now, dueDoses, permission, requestPermission } = useReminders(doses, takenToday);
+  const pendingDoses = doses.filter((d) => !takenToday.has(d.medication.id));
+  const upcomingDoses = pendingDoses.slice(0, 3);
+  const hiddenCount = pendingDoses.length - upcomingDoses.length;
+
+  // Tomas pospuestas: { [key de la toma]: timestamp hasta cuando se oculta }
+  const [snoozed, setSnoozed] = useState({});
+
+  const reminderDose = dueDoses.find(
+    (d) => (snoozed[d.key] || 0) <= Date.now()
+  );
+
 
   return (
     <div className="dashboard">
@@ -93,6 +118,59 @@ function Dashboard() {
       </header>
 
       <main className="dashboard-content">
+        {reminderDose && (
+          <div className="reminder-overlay">
+            <div
+              className="reminder-card"
+              role="alertdialog"
+              aria-labelledby="reminder-title"
+            >
+              <div className="reminder-icon">⏰</div>
+
+              <h2 id="reminder-title">
+                {minutesSince(reminderDose.hour) > 5
+                  ? "Tenés una toma pendiente"
+                  : "¡Es hora de tu medicamento!"}
+              </h2>
+
+              <p className="reminder-med">{reminderDose.medication.name}</p>
+              <p className="reminder-dosage">
+                {reminderDose.medication.dosage} · {formatTime(reminderDose.hour)}
+              </p>
+
+              <button
+                className="primary-button reminder-primary"
+                onClick={() => handleMarkTaken(reminderDose.medication.id)}
+              >
+                ✓ Ya la tomé
+              </button>
+
+              <button
+                className="reminder-secondary"
+                onClick={() =>
+                  setSnoozed((cur) => ({
+                    ...cur,
+                    [reminderDose.key]: Date.now() + 10 * 60 * 1000,
+                  }))
+                }
+              >
+                Recordarme en 10 min
+              </button>
+            </div>
+          </div>
+        )}
+
+        {permission === "default" && (
+          <button className="enable-notifications" onClick={requestPermission}>
+            🔔 Activar avisos del navegador
+          </button>
+        )}
+
+        {permission === "default" && (
+          <button className="enable-notifications" onClick={requestPermission}>
+            🔔 Activar avisos del navegador
+          </button>
+        )}
         <section className="dashboard-summary">
           <h2>Resumen de hoy</h2>
           <div className="summary-cards">
@@ -101,7 +179,7 @@ function Dashboard() {
               <span>Medicamentos</span>
             </div>
             <div className="summary-card">
-              <span className="summary-number">{pendingCount}</span>
+              <span className="summary-number">{pendingDoses.length}</span>
               <span>Próximas tomas</span>
             </div>
             <div className="summary-card">
@@ -148,32 +226,54 @@ function Dashboard() {
                 + Agregar medicamento
               </button>
             </div>
+          ) : pendingDoses.length === 0 ? (
+            <div className="empty-state">
+              <p>🎉 ¡Listo por hoy! Ya tomaste todo lo que tenías pendiente.</p>
+              <button
+                className="primary-button"
+                onClick={() => navigate("/add-medication")}
+              >
+                + Agregar medicamento
+              </button>
+            </div>
           ) : (
             <div className="upcoming-list">
-              {doses.map(({ key, medication, hour }) => {
-                const isTaken = takenToday.has(medication.id);
-                return (
-                  <div className="upcoming-item" key={key}>
-                    <div>
-                      <p className="upcoming-name">{medication.name}</p>
-                      <p className="upcoming-dosage">{medication.dosage}</p>
-                    </div>
-                    <div className="upcoming-time">
-                      <strong>{hour}</strong>
-                    </div>
-                    <button
-                      className={isTaken ? "taken-button taken" : "taken-button"}
-                      disabled={isTaken || markingId === medication.id}
-                      onClick={() => handleMarkTaken(medication.id)}
-                    >
-                      {isTaken ? "✓ Tomado" : "Ya la tomé"}
-                    </button>
+              {upcomingDoses.map(({ key, medication, hour }) => (
+                <div className="upcoming-item" key={key}>
+                  <div>
+                    <p className="upcoming-name">{medication.name}</p>
+                    <p className="upcoming-dosage">{medication.dosage}</p>
                   </div>
-                );
-              })}
+
+                  <div className="upcoming-time">
+                    <span>Hoy</span>
+                    <strong>{formatTime(hour)}</strong>
+                  </div>
+
+                  <button
+                    className="taken-button"
+                    disabled={markingId === medication.id}
+                    onClick={() => handleMarkTaken(medication.id)}
+                  >
+                    {markingId === medication.id ? "Guardando..." : "Ya la tomé"}
+                  </button>
+                </div>
+              ))}
+
+              {hiddenCount > 0 && (
+                <p className="upcoming-more">
+                  Y {hiddenCount} {hiddenCount === 1 ? "toma más" : "tomas más"} después
+                </p>
+              )}
             </div>
           )}
         </section>
+        <button
+          className="primary-button history-link"
+          onClick={() => navigate("/history")}
+        >
+          🗓️ Ver historial de tomas
+        </button>
       </main>
     </div>
   );

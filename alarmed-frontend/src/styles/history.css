@@ -1,0 +1,85 @@
+.history {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #a8b3ea 0%, #d8b9dd 50%, #f2c9d6 100%);
+  padding-bottom: 32px;
+  font-family: "Nunito", sans-serif;
+}
+
+.history-header {
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  color: white;
+  padding: 20px;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.history-header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.history-content { padding: 20px; }
+
+.history-day {
+  background: white;
+  border-radius: 18px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(76, 92, 240, 0.12);
+}
+
+.history-day h2 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  text-transform: capitalize;
+  color: var(--teal-dark);
+  font-family: "Poppins", sans-serif;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px solid #eef0fb;
+  font-size: 0.9rem;
+}
+
+.history-ok { color: #0a7a4a; font-weight: 600; }
+.history-missed { color: var(--accent-coral); font-weight: 600; }
+
+.history-empty,
+.history-message {
+  background: white;
+  border-radius: 18px;
+  padding: 28px 16px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.history-filter {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  border-left: 4px solid var(--primary);
+  background: #dde2fb;
+  font-size: 0.9rem;
+  font-family: "Nunito", sans-serif;
+  margin-bottom: 16px;
+}
+
+.history-item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-med {
+  font-weight: 600;
+  color: #1f1f2e;
+}

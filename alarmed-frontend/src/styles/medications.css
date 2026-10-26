@@ -117,24 +117,26 @@
 }
 
 .medication-card-actions button:not(.taken-button) {
-  background: var(--primary);
+  background: #4c5cf0;
   color: white;
-  border: none;
 }
 
 .medication-card-actions button:not(.taken-button):hover {
-  background: var(--primary-dark);
+  background: #3a48d1;
 }
 
-.medication-card-actions button:nth-of-type(3) {
-  background: var(--accent-coral);
+.medication-card-actions button.delete-button,
+.medication-card-actions button:not(.taken-button):nth-of-type(3) {
+  background: #f4645f;
   color: white;
 }
 
-.medication-card-actions button:nth-of-type(3):hover {
+.medication-card-actions button.delete-button:hover,
+.medication-card-actions button:not(.taken-button):nth-of-type(3):hover {
   background: #d9433e;
 }
 
+/* Ya la tomé */
 .taken-button {
   border: 1.5px solid var(--primary);
   color: var(--primary);
