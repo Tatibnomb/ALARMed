@@ -1,7 +1,10 @@
 const { Type } = require("@google/genai");
 const ai = require("../config/gemini");
 
-// Esquema que define la estructura de las advertencias que debe devolver Gemini.
+// Esquema que define la estructura de las advertencias que debe devolver Gemini:
+// le obligamos a Gemini a responder con esta forma exacta de JSON.
+// Así evitamos tener que "adivinar" el texto
+// Los "enum" limitan los valores posibles (ej. severity solo puede ser info/precaucion/importante/urgente).
 const warningAnalysisSchema = {
   type: Type.OBJECT,
   properties: {
@@ -59,7 +62,8 @@ const warningAnalysisSchema = {
   required: ["medications_analyzed", "warnings"],
 };
 
-// Instrucciones que orientan el análisis de Gemini.
+// Define el rol y las reglas de la IA. Las reglas buscan reducir riesgos:
+// que no invente interacciones ni fuentes, y que no reemplace a un profesional de salud.
 const SYSTEM_INSTRUCTION = `
 Eres un asistente computacional especializado en farmacovigilancia
 para la aplicación ALARMed.
@@ -78,7 +82,8 @@ REGLAS:
 8. No sustituyas la evaluación de un profesional de salud.
 `;
 
-// Determina si el error parece temporal y vale la pena reintentar.
+// ¿El error es TEMPORAL (vale la pena reintentar) o PERMANENTE (key inválida, modelo inexistente)?
+// 429 = demasiadas peticiones, 500/502/503/504 = el servidor de Google falló o está saturado.
 function isTemporaryGeminiError(error) {
   const status = Number(error?.status || error?.code);
 
@@ -90,7 +95,7 @@ function isTemporaryGeminiError(error) {
   );
 }
 
-// Espera una cantidad determinada de milisegundos.
+// Pausa la ejecución una cantidad de milisegundos (se usa entre reintentos).
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

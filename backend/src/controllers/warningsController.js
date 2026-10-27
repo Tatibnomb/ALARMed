@@ -1,4 +1,3 @@
-
 const { syncWarningsForUser } = require("../services/warningsService");
 
 async function syncUserWarnings(req, res) {
@@ -15,7 +14,7 @@ async function syncUserWarnings(req, res) {
     const errorCode = String(error?.status || error?.code || "")
       .toUpperCase();
 
-    // Si Gemini sigue sin estar disponible, informamos un error temporal.
+    // Si Gemini está saturado respondemos 503 (servicio no disponible, error TEMPORAL).
     if (
       Number(error?.status || error?.code) === 503 ||
       ["UNAVAILABLE", "RESOURCE_EXHAUSTED"].includes(errorCode)
@@ -39,6 +38,8 @@ async function getUserMedicationsWithWarnings(req, res) {
 
     const { data, error } = await req.supabase
       .from("medications")
+      // warning_medications es la tabla intermedia (relación muchos a muchos entre medicamentos y advertencias).
+      // Una advertencia puede involucrar varios medicamentos (ej. Aspirina + Ibuprofeno).
       .select(`
         *,
         warning_medications (

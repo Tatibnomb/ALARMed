@@ -1,7 +1,8 @@
 const { createClient } = require("@supabase/supabase-js");
 
+// Las credenciales se leen del .env para no dejarlas escritas en el código
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseKey = process.env.SUPABASE_KEY; // / clave "anon" (pública, protegida por RLS)
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error("Faltan SUPABASE_URL o SUPABASE_KEY en el .env");

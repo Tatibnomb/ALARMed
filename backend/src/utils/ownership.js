@@ -1,5 +1,6 @@
 const supabase = require("../config/supabase");
 
+// Verifica si un medicamento pertenece a un usuario específico
 const medicationBelongsToUser = async (db, medicationId, userId) => {
     const { data, error } = await db
         .from("medications")
@@ -11,6 +12,7 @@ const medicationBelongsToUser = async (db, medicationId, userId) => {
     return !error && !!data;
 };
 
+// Obtiene los IDs de los medicamentos de un usuario específico
 const getUserMedicationIds = async (db, userId) => {
     const { data, error } = await db
         .from("medications")
