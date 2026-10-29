@@ -9,6 +9,7 @@ import {
   markDoseTaken,
   getWarnings,
   syncWarnings,
+  updateSchedule,
 } from "../services/api";
 
 const formatTime = (hhmm) => {
@@ -48,7 +49,7 @@ function Dashboard() {
         getTodayIntakes(),
       ]);
       setMedications(meds);
-      setTakenToday(new Set(intakes.map((i) => i.medication_id)));
+      setTakenToday(new Set(intakes.map((i) => i.schedule_id).filter(Boolean)));
     } catch (e) {
       console.error("Dashboard:", e);
     }
@@ -95,17 +96,33 @@ function Dashboard() {
     .sort((a, b) => a.hour.localeCompare(b.hour));
 
   const { now, dueDoses, permission, requestPermission } = useReminders(doses, takenToday);
-  const pendingDoses = doses.filter((d) => !takenToday.has(d.medication.id));
+  const pendingDoses = doses.filter((d) => !takenToday.has(d.key));
   const upcomingDoses = pendingDoses.slice(0, 3);
   const hiddenCount = pendingDoses.length - upcomingDoses.length;
 
   // Tomas pospuestas: { [key de la toma]: timestamp hasta cuando se oculta }
-  const [snoozed, setSnoozed] = useState({});
+  const reminderDose = dueDoses[0];
 
-  const reminderDose = dueDoses.find(
-    (d) => (snoozed[d.key] || 0) <= Date.now()
-  );
+  const handlePostpone = async (dose) => {
+    try {
+      setMarkingId(dose.key);
 
+      const d = new Date(Date.now() + 10 * 60 * 1000);
+      const crossesMidnight = d.getDate() !== new Date().getDate();
+
+      // Si pasaría de medianoche, lo dejamos en 23:59 para que siga siendo de hoy
+      const newHour = crossesMidnight
+        ? "23:59"
+        : `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+
+      await updateSchedule(dose.key, newHour);
+      await loadData();
+    } catch (e) {
+      alert(e.message || "No se pudo posponer la toma.");
+    } finally {
+      setMarkingId(null);
+    }
+  };
 
   return (
     <div className="dashboard">
@@ -147,12 +164,8 @@ function Dashboard() {
 
               <button
                 className="reminder-secondary"
-                onClick={() =>
-                  setSnoozed((cur) => ({
-                    ...cur,
-                    [reminderDose.key]: Date.now() + 10 * 60 * 1000,
-                  }))
-                }
+                disabled={markingId === reminderDose.key}
+                onClick={() => handlePostpone(reminderDose)}
               >
                 Recordarme en 10 min
               </button>

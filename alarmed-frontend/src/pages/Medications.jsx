@@ -45,7 +45,7 @@ function Medications() {
 
       setMedications(medsData);
       setTakenToday(
-        new Set(intakesData.map((intake) => intake.medication_id))
+        new Set(intakesData.map((intake) => intake.schedule_id).filter(Boolean))
       );
     } catch (error) {
       console.error("Error al obtener medicamentos:", error);
