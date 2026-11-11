@@ -212,12 +212,18 @@ export const deleteMedication = async (id) => {
 // =========================
 // MARCAR TOMA COMO HECHA
 // =========================
-export const markDoseTaken = async (medicationId) => {
+export const markDoseTaken = async (medicationId, scheduleId) => {
   const token = localStorage.getItem("token");
 
   if (!token) {
     throw new Error("No hay una sesión iniciada");
   }
+
+  // Soporta llamar como: markDoseTaken({ medication_id, schedule_id })
+  // o como: markDoseTaken(medicationId, scheduleId)
+  const payload = typeof medicationId === "object" 
+    ? medicationId 
+    : { medication_id: medicationId, schedule_id: scheduleId, taken: true };
 
   const response = await fetch(`${API_URL}/intakes`, {
     method: "POST",
@@ -226,7 +232,8 @@ export const markDoseTaken = async (medicationId) => {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      medication_id: medicationId,
+      medication_id: payload.medication_id,
+      schedule_id: payload.schedule_id || null,
       taken: true,
     }),
   });

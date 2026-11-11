@@ -86,6 +86,11 @@ const createMedication = async (req, res) => {
       });
     }
 
+    // Al finalizar la creación exitosa:
+    // Disparar sincronización de IA en segundo plano (sin bloquear la respuesta HTTP al cliente)
+    syncWarningsForUser(req.user.id).catch(err => 
+      console.error("Error al sincronizar advertencias en segundo plano:", err)
+    );
     // 5. Retornar respuesta exitosa con los datos insertados
     return res.status(201).json({
       medication: newMedication,
@@ -144,6 +149,10 @@ const deleteMedication = async (req, res) => {
       return res.status(400).json({ message: error.message });
     }
 
+    // Sincronizar advertencias en background
+    syncWarningsForUser(req.user.id).catch(err => 
+      console.error("Error al sincronizar tras eliminar:", err)
+    );
     return res.json({ message: "Medicamento eliminado correctamente." });
   } catch (err) {
     console.error("Error en deleteMedication:", err);
