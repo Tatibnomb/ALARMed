@@ -20,7 +20,7 @@ export default function useReminders(doses, takenToday) {
 
   // Tomas cuya hora ya llegó (o pasó) y siguen sin marcarse
   const dueDoses = doses.filter(
-    (d) => d.hour <= now && !takenToday.has(d.medication.id)
+    (d) => d.hour <= now && !takenToday.has(d.key)
   );
 
   // Dispara la notificación del navegador una sola vez por toma
@@ -30,7 +30,7 @@ export default function useReminders(doses, takenToday) {
     const today = new Date().toDateString();
 
     dueDoses.forEach((d) => {
-      const id = `${d.key}-${today}`;
+      const id = `${d.key}-${d.hour}-${today}`;
       if (d.hour === now && !notified.current.has(id)) {
         notified.current.add(id);
         new Notification("ALARMed 💊", {
