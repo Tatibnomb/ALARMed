@@ -60,11 +60,14 @@ function Dashboard() {
     loadData();
   }, []);
 
-  const handleMarkTaken = async (medicationId) => {
+  // ✅ CORREGIDO: Recibe medicationId y scheduleId para registrar correctamente en la API
+  const handleMarkTaken = async (medicationId, scheduleId) => {
     try {
-      setMarkingId(medicationId);
-      await markDoseTaken(medicationId);
-      setTakenToday((cur) => new Set(cur).add(medicationId));
+      setMarkingId(scheduleId);
+      await markDoseTaken({ medication_id: medicationId, schedule_id: scheduleId, taken: true });
+      
+      // Guardamos el schedule_id en el Set para actualizar el estado local
+      setTakenToday((cur) => new Set(cur).add(scheduleId));
     } catch (e) {
       alert(e.message || "No se pudo registrar la toma.");
     } finally {
@@ -84,23 +87,32 @@ function Dashboard() {
     }
   };
 
-  // Una fila por cada horario de cada medicamento, ordenadas por hora
-  const doses = medications
+  // ✅ CORREGIDO: Mapeo de dosis con eliminación de duplicados por combinación (medication_id + hora)
+  const allDoses = medications
     .flatMap((m) =>
       (m.schedules || []).map((s) => ({
         key: s.id,
+        medicationId: m.id,
         medication: m,
         hour: s.hour.slice(0, 5),
       }))
     )
     .sort((a, b) => a.hour.localeCompare(b.hour));
 
+  // Filtrar dosis redundantes cargadas a la misma hora para el mismo medicamento
+  const doses = allDoses.filter(
+    (dose, index, self) =>
+      index ===
+      self.findIndex(
+        (d) => d.medicationId === dose.medicationId && d.hour === dose.hour
+      )
+  );
+
   const { now, dueDoses, permission, requestPermission } = useReminders(doses, takenToday);
   const pendingDoses = doses.filter((d) => !takenToday.has(d.key));
   const upcomingDoses = pendingDoses.slice(0, 3);
   const hiddenCount = pendingDoses.length - upcomingDoses.length;
 
-  // Tomas pospuestas: { [key de la toma]: timestamp hasta cuando se oculta }
   const reminderDose = dueDoses[0];
 
   const handlePostpone = async (dose) => {
@@ -110,7 +122,6 @@ function Dashboard() {
       const d = new Date(Date.now() + 10 * 60 * 1000);
       const crossesMidnight = d.getDate() !== new Date().getDate();
 
-      // Si pasaría de medianoche, lo dejamos en 23:59 para que siga siendo de hoy
       const newHour = crossesMidnight
         ? "23:59"
         : `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
@@ -157,7 +168,7 @@ function Dashboard() {
 
               <button
                 className="primary-button reminder-primary"
-                onClick={() => handleMarkTaken(reminderDose.medication.id)}
+                onClick={() => handleMarkTaken(reminderDose.medication.id, reminderDose.key)}
               >
                 ✓ Ya la tomé
               </button>
@@ -179,11 +190,6 @@ function Dashboard() {
           </button>
         )}
 
-        {permission === "default" && (
-          <button className="enable-notifications" onClick={requestPermission}>
-            🔔 Activar avisos del navegador
-          </button>
-        )}
         <section className="dashboard-summary">
           <h2>Resumen de hoy</h2>
           <div className="summary-cards">
@@ -265,10 +271,10 @@ function Dashboard() {
 
                   <button
                     className="taken-button"
-                    disabled={markingId === medication.id}
-                    onClick={() => handleMarkTaken(medication.id)}
+                    disabled={markingId === key}
+                    onClick={() => handleMarkTaken(medication.id, key)}
                   >
-                    {markingId === medication.id ? "Guardando..." : "Ya la tomé"}
+                    {markingId === key ? "Guardando..." : "Ya la tomé"}
                   </button>
                 </div>
               ))}
@@ -281,6 +287,7 @@ function Dashboard() {
             </div>
           )}
         </section>
+
         <button
           className="primary-button history-link"
           onClick={() => navigate("/history")}
