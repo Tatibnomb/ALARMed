@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { getIntakes, getMedications } from "../services/api";
 import "../styles/history.css";
 
+// Normaliza la fecha como UTC si viene de Postgres sin la 'Z' final
+const parseUtcDate = (isoString) => {
+  if (!isoString) return new Date();
+  const hasTimezone = /Z|[+-]\d{2}(?::?\d{2})?$/.test(isoString);
+  return new Date(hasTimezone ? isoString : `${isoString}Z`);
+};
+
 function History() {
   const navigate = useNavigate();
 
@@ -40,7 +47,8 @@ function History() {
 
   // Agrupa por día
   const byDay = filtered.reduce((acc, intake) => {
-    const day = new Date(intake.taken_at).toLocaleDateString("es-AR", {
+    const day = parseUtcDate(intake.taken_at).toLocaleDateString("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -101,9 +109,10 @@ function History() {
                     </span>
                   </div>
                   <span>
-                    {new Date(i.taken_at).toLocaleTimeString("es-AR", {
+                    {parseUtcDate(i.taken_at).toLocaleTimeString("es-AR", {
                       hour: "2-digit",
                       minute: "2-digit",
+                      timeZone: "America/Argentina/Buenos_Aires",
                     })}
                   </span>
                 </div>

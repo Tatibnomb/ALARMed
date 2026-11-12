@@ -71,7 +71,7 @@ export const createMedication = async ({
       throw new Error(`Error en el servidor (${response.status}). Revisa la consola del backend.`);
     }
   }
-
+  await syncWarnings().catch(() => {});
   return await response.json();
 };
 
@@ -179,7 +179,7 @@ export const updateMedication = async (
   if (!response.ok) {
     throw new Error(data.message || "Error al editar el medicamento");
   }
-
+  await syncWarnings().catch(() => {});
   return data;
 };
 
@@ -205,7 +205,7 @@ export const deleteMedication = async (id) => {
   if (!response.ok) {
     throw new Error(data.message || "Error al eliminar el medicamento");
   }
-
+  await syncWarnings().catch(() => {});
   return data;
 };
 
@@ -247,6 +247,12 @@ export const markDoseTaken = async (medicationId, scheduleId) => {
   return data;
 };
 
+// Helper para normalizar fechas UTC provenientes de Postgres sin 'Z'
+const parseUtcDate = (isoString) => {
+  if (!isoString) return new Date();
+  const hasTimezone = /Z|[+-]\d{2}(?::?\d{2})?$/.test(isoString);
+  return new Date(hasTimezone ? isoString : `${isoString}Z`);
+};
 // =========================
 // TOMAS DE HOY
 // =========================

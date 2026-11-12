@@ -60,7 +60,6 @@ function Dashboard() {
     loadData();
   }, []);
 
-  // ✅ CORREGIDO: Recibe medicationId y scheduleId para registrar correctamente en la API
   const handleMarkTaken = async (medicationId, scheduleId) => {
     try {
       setMarkingId(scheduleId);
@@ -87,7 +86,6 @@ function Dashboard() {
     }
   };
 
-  // ✅ CORREGIDO: Mapeo de dosis con eliminación de duplicados por combinación (medication_id + hora)
   const allDoses = medications
     .flatMap((m) =>
       (m.schedules || []).map((s) => ({

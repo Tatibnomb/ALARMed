@@ -1,5 +1,6 @@
 const { parseIntervalHours, computeDoseHours } = require("../utils/schedule");
 const supabase = require("../config/supabase");
+const { syncWarningsForUser } = require("../services/warningsService");
 
 const getMedications = async (req, res) => {
   try {

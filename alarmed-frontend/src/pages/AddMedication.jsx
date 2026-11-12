@@ -153,28 +153,12 @@ function AddMedication() {
               value={frequency}
               onChange={(e) => setFrequency(e.target.value)}
             >
-
-              <option value="">
-                Seleccioná una frecuencia
-              </option>
-
-              <option value="Una vez al día">
-                Una vez al día
-              </option>
-
-              <option value="Dos veces al día">
-                Dos veces al día
-              </option>
-
-              <option value="Tres veces al día">
-                Tres veces al día
-              </option>
-
-              <option value="Otra">
-                Otra
-              </option>
-
-            </select>
+              <option value="">Seleccioná una frecuencia</option>
+              <option value="Una vez al día">Una vez al día (cada 24 hs)</option>
+              <option value="Dos veces al día">Dos veces al día (cada 12 hs)</option>
+              <option value="Tres veces al día">Tres veces al día (cada 8 hs)</option>
+              <option value="Cada 6 horas">Cuatro veces al día (cada 6 hs)</option>
+              </select>
 
           </div>
 
